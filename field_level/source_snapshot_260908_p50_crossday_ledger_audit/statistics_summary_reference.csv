@@ -1,0 +1,2 @@
+dataset,high_sample,blank_sample,high_fov_n,blank_fov_n,threshold_blank_mean_minus_3sd,high_points,blank_points,pooled_high_exceedance_rate,pooled_blank_exceedance_rate,fov_rate_mannwhitney_U,fov_rate_mannwhitney_p,canonical_fov_delta_mean_U,canonical_fov_delta_mean_p,point_mannwhitney_p_descriptive_only
+260827_DNA_Sample12_vs_Blank11,12,11,6,7,-0.4401158833745688,499945,597609,0.0088649751472662,0.0094242221921021,22.0,0.9452214452214451,19.0,0.8356643356643356,0.0245093138478987

@@ -1,0 +1,14 @@
+[
+  {
+    "id": "260827_DNA_Sample12_vs_Blank11",
+    "root": "C:/Users/chuya/Documents/Codex/2026-09-08/pc-alignment-p50-crossday-continuation/work/260827_sample12vs11/raw",
+    "high": {
+      "sample": 12,
+      "positions": [1, 2, 3, 4, 5, 6, 7, 8]
+    },
+    "blank": {
+      "sample": 11,
+      "positions": [1, 2, 3, 4, 5, 6, 8]
+    }
+  }
+]
