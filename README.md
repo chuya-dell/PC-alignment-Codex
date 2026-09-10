@@ -14,6 +14,8 @@
 
 各バージョンフォルダには必ず `NOTES.md` を置く。既存バージョンのコード・パラメータは上書きせず、変更は新しい `vN_説明/` を追加して行う。
 
+他のPCで作業を再開する場合は、最初に [`AGENTS.md`](AGENTS.md) と [`docs/REPOSITORY_CONVENTIONS.md`](docs/REPOSITORY_CONVENTIONS.md) を読む。新規解析を置く前に、粒度とバージョンをここで決める。
+
 ## 現行バージョン
 
 - [`pillar_level/v1_human_approved_pixel_masks/`](pillar_level/v1_human_approved_pixel_masks/): 周期残差を候補化し、目視承認されたpre画像座標ポリゴンだけをマスクにする処理。
