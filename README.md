@@ -20,5 +20,10 @@
 
 - [`pillar_level/v1_human_approved_pixel_masks/`](pillar_level/v1_human_approved_pixel_masks/): 周期残差を候補化し、目視承認されたpre画像座標ポリゴンだけをマスクにする処理。
 - [`field_level/v1_pixel_mask_count_comparison/`](field_level/v1_pixel_mask_count_comparison/): 旧視野全体除外方式と承認済みピクセルマスク方式の有効数比較。p値の再計算はしない。
+- [`field_level/source_snapshot_260910_raw_qc_brightness/`](field_level/source_snapshot_260910_raw_qc_brightness/): 他チャットから保存した全視野raw輝度差の補助QC。既存の格子点エンドポイントとは別物で、新旧関係は未判定。
 
 自動候補は欠陥として採用されない。pre/post双方の目視確認、承認者、承認日、pre画像ネイティブ画素座標のポリゴンが揃った承認行だけが解析へ流れる。
+
+## 他チャットからの保存
+
+取り込み済み成果とその出所は [`data/raw/artifact_provenance_registry.csv`](data/raw/artifact_provenance_registry.csv) に記録する。作成日時は出所の手掛かりに留め、内容・パラメータ・検証結果の比較が済むまで、どちらが新しいかを判定しない。

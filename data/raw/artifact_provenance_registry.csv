@@ -1,0 +1,2 @@
+artifact_id,source_thread_id,source_title,source_updated_at_jst,source_path,analysis_level,artifact_kind,newness_status,supersedes_artifact_id,import_state,repository_destination,summary
+codex-01a088cc-raw-qc-260910,01a088cc-89f3-76b1-bc97-67baee438b60,Add batch brightness diff script,2026-09-10,C:\Users\chuya\Documents\Codex\2026-09-10\files-pasted-by-the-user-batch\outputs,field_level,script+validation+reference_csv,unknown,,imported_snapshot,field_level/source_snapshot_260910_raw_qc_brightness,Raw全視野平均のpre-post差を補助QCとして扱う。格子点直接サンプリングの研究エンドポイントを置換しない。

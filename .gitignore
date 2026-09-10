@@ -5,3 +5,5 @@ cache/
 outputs/
 data/results/*
 !data/results/README.md
+!data/results/reference_snapshots/
+!data/results/reference_snapshots/*.csv

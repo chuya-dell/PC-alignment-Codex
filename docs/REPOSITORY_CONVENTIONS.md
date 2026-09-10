@@ -7,6 +7,7 @@
 3. 既存の該当バージョンを確認する。既存処理・パラメータを変えるなら、旧版を変更せず次の `vN_説明` を作る。
 4. 入力は `data/raw/`、出力は `data/results/` を使う。コードとデータを同じ場所に置かない。
 5. 作業後、該当 `NOTES.md` の「実装内容」「結果概要」「既知の問題」を更新する。
+6. 他チャット由来のものは、作成日時だけで既存コードを上書きしない。まず `data/raw/artifact_provenance_registry.csv` に登録し、比較状態を `unknown` として独立保存する。
 
 ## 配置の判断表
 
@@ -40,6 +41,13 @@ pillar_level/
 - このリポジトリはCodex担当分である。
 - Claude担当分は `PC-alignment-claude`、Antigravity担当分は `PC-alignment-anti` に置く。
 - 3手法の比較は将来の別タスクとして実施する。現時点で各リポジトリのコード・結果を混在させない。
+
+## 他チャット成果の取り込み
+
+- 取り込み時には、元のCodexタスクID、元パス、元タスクの更新日時、解析粒度、要約、Git上の保存先を `data/raw/artifact_provenance_registry.csv` に残す。
+- `newness_status=unknown` は「旧版」でも「最新版」でもなく、比較未実施を意味する。日付だけで変更順序や優劣を決めない。
+- 比較を行う場合は、入力データ、パラメータ、依存コード、検証結果を並べてから、明示的に `supersedes_artifact_id` を記録する。比較前の成果は削除・上書きしない。
+- 小さな再現用CSVは `data/results/reference_snapshots/` に追跡可能な形で置いてよい。ただし実験画像、生成画像、大容量出力、キャッシュはGitへ追加しない。
 
 ## 現行の安全境界
 
