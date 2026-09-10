@@ -3,15 +3,18 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 from pathlib import Path
 
 import cv2
 import numpy as np
 import pandas as pd
 
-import analyzer
-import defect_masking as dm
-import registration
+ROOT = Path(__file__).resolve().parents[2]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from shared import analyzer, defect_masking as dm, registration
 
 
 REVIEW_COLUMNS = [

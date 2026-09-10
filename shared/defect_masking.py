@@ -126,7 +126,7 @@ def residual_candidate_regions(
 
 def transform_polygon(polygon: np.ndarray, transform: dict, direction: str) -> np.ndarray:
     """Move a polygon through registration without changing its coordinate authority."""
-    import registration
+    from shared import registration
 
     points = np.asarray(polygon, float)
     if direction == "pre_to_post":
@@ -212,7 +212,7 @@ def excluded_grid_fraction(
     post_mask: np.ndarray,
 ) -> tuple[float, np.ndarray]:
     """Measure the union of masked 3x3 sampling footprints over the grid."""
-    import registration
+    from shared import registration
 
     dummy = np.zeros(pre_mask.shape, np.float32)
     pre_valid = registration.sample_contrast(dummy, pre_coordinates, invalid_mask=pre_mask).valid_sampling.to_numpy()

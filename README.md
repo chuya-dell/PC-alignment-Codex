@@ -1,7 +1,22 @@
 # PC-alignment-Codex
 
-人手承認を必須とする、プラズモニック単分子カウント用のピクセルレベル欠陥マスク実装です。
+このリポジトリはCodex担当分。対応するClaude版は PC-alignment-claude、Antigravity版は PC-alignment-anti。3手法の比較はいずれ実施予定。
 
-実行コードと運用手順は [`defect_mask_pipeline/`](defect_mask_pipeline/) にあります。
+プラズモニック結晶を用いるデジタル単分子カウントの位置合わせ処理を、ピラー単位と視野単位で明確に分離して管理する。
 
-自動候補は欠陥として採用されません。pre/post双方の目視確認、承認者、承認日、pre画像ネイティブ画素座標のポリゴンが揃った承認行だけが解析へ流れます。
+## 構成と命名規則
+
+- `pillar_level/`: ピラー1本ごとの座標、コントラスト、欠陥領域の解析。実行ファイルは `pillar_` で始める。
+- `field_level/`: 視野を単位とする集計・比較。実行ファイルは `field_` で始める。
+- `shared/`: 両粒度で共用する位置合わせ、格子、画像サンプリング、承認済みマスクの安全な読込み。粒度を持たないためここへ置く。
+- `data/raw/`: 実験画像へのパスを示すマニフェストと、一次記録から構造化した入力台帳。画像本体は格納しない。
+- `data/results/`: 実行で生成するレビュー画像・CSV・比較表の保存先。Gitには入れない。
+
+各バージョンフォルダには必ず `NOTES.md` を置く。既存バージョンのコード・パラメータは上書きせず、変更は新しい `vN_説明/` を追加して行う。
+
+## 現行バージョン
+
+- [`pillar_level/v1_human_approved_pixel_masks/`](pillar_level/v1_human_approved_pixel_masks/): 周期残差を候補化し、目視承認されたpre画像座標ポリゴンだけをマスクにする処理。
+- [`field_level/v1_pixel_mask_count_comparison/`](field_level/v1_pixel_mask_count_comparison/): 旧視野全体除外方式と承認済みピクセルマスク方式の有効数比較。p値の再計算はしない。
+
+自動候補は欠陥として採用されない。pre/post双方の目視確認、承認者、承認日、pre画像ネイティブ画素座標のポリゴンが揃った承認行だけが解析へ流れる。

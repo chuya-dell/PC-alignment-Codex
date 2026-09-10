@@ -1,4 +1,5 @@
 import json
+import sys
 import tempfile
 import unittest
 from pathlib import Path
@@ -6,8 +7,11 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-import defect_masking as dm
-import registration
+ROOT = Path(__file__).resolve().parents[3]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from shared import defect_masking as dm, registration
 
 
 def approval_row(**updates):

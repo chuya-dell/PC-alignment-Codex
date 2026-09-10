@@ -3,3 +3,5 @@ __pycache__/
 .pytest_cache/
 cache/
 outputs/
+data/results/*
+!data/results/README.md

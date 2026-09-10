@@ -10,8 +10,8 @@ import numpy as np
 import pandas as pd
 from scipy.spatial import KDTree
 
-from lattice_indexing import HexLattice, grid_coordinates
-from registration import sample_contrast
+from .lattice_indexing import HexLattice, grid_coordinates
+from .registration import sample_contrast
 
 
 def sample_grid_features(image, lattice: HexLattice, margin=30, invalid_mask=None):
