@@ -1,0 +1,16 @@
+assay,sample,concentration_m,concentration_label,defect_view_exclusions,planned_clean_fovs,newness_status
+SAM,1,1e-9,1 nM,"5;7;8","1;2;3;4;6",unknown
+SAM,2,1e-10,100 pM,"1;2","3;4;5;6;7;8",unknown
+SAM,3,1e-11,10 pM,"8","1;2;3;4;5;6;7",unknown
+SAM,4,1e-12,1 pM,"6","1;2;3;4;5;7;8",unknown
+SAM,5,1e-13,100 fM,"1;7;8","2;3;4;5;6",unknown
+SAM,6,1e-14,10 fM,"","1;2;3;4;5;6;7;8",unknown
+SAM,7,1e-15,1 fM,"","1;2;3;4;5;6;7;8",unknown
+SAM,8,0,Blank,"","1;2;3;4;5;6;7;8",unknown
+DNA,1,1e-9,1 nM,"","1;2;3;4;5;6;7;8",unknown
+DNA,2,1e-10,100 pM,"3","1;2;4;5;6;7;8",unknown
+DNA,9,1e-11,10 pM,"4","1;2;3;5;6;7;8",unknown
+DNA,4,1e-12,1 pM,"3;7;8","1;2;4;5;6",unknown
+DNA,10,1e-14,10 fM,"4","1;2;3;5;6;7;8",unknown
+DNA,7,1e-15,1 fM,"2;3;6","1;4;5;7;8",unknown
+DNA,8,0,Blank,"3","1;2;4;5;6;7;8",unknown
