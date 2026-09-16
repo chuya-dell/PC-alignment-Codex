@@ -1,0 +1,27 @@
+{
+  "purpose": "Validate a rebuilt affine 0.25-to-1.0 ECC workflow against the 2026-09-01 recorded values before any FOV 1-6 rescue search.",
+  "date": "260826",
+  "modality": "SAM",
+  "sample": 1,
+  "root": "G:/マイドライブ/1.実験データ_gdrive/4.生データ/4.生データ D/260826-p50-sam",
+  "established_pitch_px": 7.286,
+  "pyramid_scales": [0.25, 0.5, 1.0],
+  "validation_positions": [1, 2, 3, 4, 5, 7, 8],
+  "reference_20260901": {
+    "1": {"rho": 0.978, "tx_px": -7.64, "ty_px": 12.02, "theta_deg": -0.013, "delta_scale_pct": 0.034},
+    "2": {"rho": 0.984, "tx_px": -11.55, "ty_px": 2.33, "theta_deg": -0.012, "delta_scale_pct": 0.026},
+    "3": {"rho": 0.984, "tx_px": -7.27, "ty_px": -10.66, "theta_deg": -0.011, "delta_scale_pct": 0.025},
+    "4": {"rho": 0.956, "tx_px": -11.94, "ty_px": 0.07, "theta_deg": -0.013, "delta_scale_pct": 0.049},
+    "5": {"rho": 0.992, "tx_px": 6.45, "ty_px": -8.47, "theta_deg": -0.011, "delta_scale_pct": 0.027},
+    "6": {"rho": 0.971, "tx_px": 1.33, "ty_px": -2.03, "theta_deg": -0.026, "delta_scale_pct": -0.239},
+    "7": {"rho": 0.989, "tx_px": -4.14, "ty_px": -6.39, "theta_deg": -0.006, "delta_scale_pct": -0.005},
+    "8": {"rho": 0.987, "tx_px": 9.08, "ty_px": -2.82, "theta_deg": -0.012, "delta_scale_pct": 0.077}
+  },
+  "proposed_validation_tolerances": {
+    "rho_abs": 0.015,
+    "translation_axis_px": 3.0,
+    "theta_deg": 0.01,
+    "delta_scale_pct": 0.10,
+    "minimum_full_matches": 6
+  }
+}

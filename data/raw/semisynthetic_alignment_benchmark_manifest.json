@@ -1,0 +1,11 @@
+{
+  "purpose": "Versioned semi-synthetic alignment benchmark with known affine truth and injected positive spikes.",
+  "root": "G:/マイドライブ/1.実験データ_gdrive/4.生データ/4.生データ D/260826-p50-sam",
+  "sample": 1,
+  "positions": [1, 2, 5, 6, 8],
+  "spike_counts": [20, 50, 100],
+  "seed": 20260916,
+  "spike_amplitude_normalized": 0.08,
+  "spike_sigma_px": 1.2,
+  "match_radius_px": 3.0
+}

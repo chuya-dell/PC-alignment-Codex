@@ -1,0 +1,14 @@
+{
+  "purpose": "Phase 2 root-cause diagnosis for the 260826 p50 SAM Sample-1 Position-6 ECC local-solution anomaly.",
+  "date": "260826",
+  "modality": "SAM",
+  "sample": 1,
+  "root": "G:/マイドライブ/1.実験データ_gdrive/4.生データ/4.生データ D/260826-p50-sam",
+  "target_position": 6,
+  "comparison_positions": [1, 5],
+  "established_pitch_px": 7.286,
+  "image_shape_expected": [2044, 2048],
+  "deep_pyramid_scales": [0.125, 0.25, 0.5, 1.0],
+  "standard_pyramid_scales": [0.25, 0.5, 1.0],
+  "initial_translation_grid_px": [-10, -5, 0, 5, 10]
+}
