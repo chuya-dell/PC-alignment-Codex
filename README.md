@@ -148,6 +148,26 @@ Phase 2(`register_image_pair_affine`)の役割を確認した。**これまで�
 設計と、Phase 1自身のPosition 6問題の検証が別途必要。詳細は
 [`docs/MASKED_SCORING_AND_PIPELINE_VERIFICATION_20260916.md`](docs/MASKED_SCORING_AND_PIPELINE_VERIFICATION_20260916.md) を参照。
 
+## Phase 1が現行パイプラインでも使用中であることの確認、実データへの影響評価（2026-09-17）
+
+2026-09-07〜10のパイプライン再構築(canonical_grid方式、pre画像FFT理論格子+検出を
+経由しない直接サンプリング)によりPhase 1が置き換えられた可能性を確認した。
+**結論: 置き換えられていない。** canonical_grid経路(正本は`PC-alignment-anti`)の
+`run_canonical_theoretical_grid.py`も、post画像への射影に使う変換の推定に
+`align_and_match_dataframes(..., local_refinement=False)`を呼んでおり、
+Phase 1は今も現行パイプラインの一部である(「検出を経由しない」は格子点選択の話で、
+変換推定自体はPhase 1のICPに依存)。
+
+260826 Sample1・Position 6の実データでPhase 1を再現実行したところ、ICP反復回数
+(15回)が2026-09-10のcanonical_grid本番結果CSVと完全一致し、**同じ登録異常が
+本番データにも混入していたことを直接確認した。** Position 6のexceeds_rate(1.445%)は
+この日のSample1で最大(次点の約1.3倍、清浄な視野の約1000倍)だった。ただしこの日の
+Blankはn=1で統計検定の検出力が元々ほぼ無く、Position 6が「濃度依存シグナルなし」
+という結論を反転させた証拠はない。また260828・260829では、Position 6は
+Position 2・3・4・8と同程度の「書き込みフィールド境界の影響をやや受ける視野群」の
+一員であり、常に突出した外れ値というわけではなかった。詳細は
+[`docs/PHASE1_PRODUCTION_USAGE_VERIFICATION_20260916.md`](docs/PHASE1_PRODUCTION_USAGE_VERIFICATION_20260916.md) を参照。
+
 自動候補は欠陥として採用されない。pre/post双方の目視確認、承認者、承認日、pre画像ネイティブ画素座標のポリゴンが揃った承認行だけが解析へ流れる。
 
 ## 他チャットからの保存
