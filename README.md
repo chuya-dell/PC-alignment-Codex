@@ -76,6 +76,21 @@ ORB/RANSACは独立監査・フォールバック候補、Dense Farnebackは不�
 生データは
 [`docs/SEMISYNTHETIC_BENCHMARK_VERIFICATION_20260916.md`](docs/SEMISYNTHETIC_BENCHMARK_VERIFICATION_20260916.md) を参照。
 
+## 縦・回転・拡大縮小の実データ規模頑健性確認、標準方式の切り替え保留（2026-09-16）
+
+上記の並進検証を縦方向・回転・拡大縮小にも拡張した。縦・拡大縮小ではORB/RANSACはECCと
+同等以上に頑健だったが、**回転では明確に劣った。** 実データ規模の回転単独
+（−0.198度、Position 6級）で、ORB/RANSACはPosition 6において並進誤差が0.1px未満から
+約2.9pxへ跳ね上がり、偽陽性率が0.00%→98.89%まで悪化した。同じ回転量を他4視野に与えても
+誤差0.12px以下に収まったため、Position 6の実画像内容とORB/RANSACの組み合わせに特有の
+弱点と判断した。ECCは同条件で並進誤差0.001px程度と安定していた。
+
+**この結果、標準方式の切り替えは保留する。** アフィンECC + 0.25→0.5→1.0ピラミッドを
+標準のまま維持し、Phase 2以降の呼び出し口は変更していない。なお、ECC側の弱点
+（Position 6級の大きな並進、約−26.8pxで局所解に陥る）も解消されていないため、
+今回の3方式の中でPosition 6を無条件に信頼できる単一標準は無い。詳細は
+[`docs/AXIS_ROBUSTNESS_VERIFICATION_20260916.md`](docs/AXIS_ROBUSTNESS_VERIFICATION_20260916.md) を参照。
+
 自動候補は欠陥として採用されない。pre/post双方の目視確認、承認者、承認日、pre画像ネイティブ画素座標のポリゴンが揃った承認行だけが解析へ流れる。
 
 ## 他チャットからの保存
