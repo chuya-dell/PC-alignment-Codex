@@ -371,3 +371,115 @@ def create_grid_estimated_dataframe(df_ref, H_final, tgt_img_path):
     result["mean_intensity"] = result["ints"]/9
     result["is_estimated"] = True
     return result
+
+
+# ---------------------------------------------------------------------------
+# Phase 2: whole-image affine registration (image01 -> image01, not pillar
+# dataframes).  This is a separate, newer registration path from
+# align_and_match_dataframes above (which remains Phase 1's point-cloud/ICP
+# approach and is untouched). Added 2026-09-17 to support masked re-evaluation
+# of the semi-synthetic benchmark (field_level/v5-v7) after the Position 6
+# image forensics (docs/POSITION6_IMAGE_FORENSICS_20260916.md) found a
+# write-field-boundary band at Positions 6/7. The chosen default method is
+# set below once that masked comparison decides it -- see
+# docs/MASKED_ALIGNMENT_FINAL_DECISION_20260916.md. No caller in this
+# repository invokes register_image_pair_affine yet;
+# pillar_level/v1_human_approved_pixel_masks still calls
+# align_and_match_dataframes (Phase 1). Wiring Phase 1 callers over to this
+# function is left for a follow-up request.
+# ---------------------------------------------------------------------------
+
+def image01_for_registration(raw: np.ndarray) -> np.ndarray:
+    """Native 16-bit intensity normalized to float32 [0, 1], no extra filtering."""
+    return (np.asarray(raw, np.float32) / 65535.0).astype(np.float32)
+
+
+def estimate_affine_ecc(pre01: np.ndarray, post01: np.ndarray, exclude_mask: np.ndarray = None,
+                        scales: tuple = (.25, .5, 1.0), iterations: int = 50, eps: float = 1e-6) -> np.ndarray:
+    """Affine ECC over a coarse-to-fine pyramid.
+
+    exclude_mask (True=exclude), if given, is resized (nearest-neighbour, to stay binary) to
+    each pyramid level and passed as cv2.findTransformECC's own inputMask. An earlier version
+    of this function instead flattened excluded pixels to a constant (median) value in both
+    images before correlating; that introduced a large, sharp, artificial rectangular edge at
+    the mask boundary that ECC would latch onto, producing far worse registration than no
+    masking at all (verified on 260826 Position 6: ty-axis error went from 0.003 px unmasked
+    to 467 px with value-flattening). Passing inputMask directly, with no pixel-value change,
+    does not create that artifact and was verified to reproduce near-zero error on the same
+    case (see docs/MASKED_ALIGNMENT_FINAL_DECISION_20260916.md)."""
+    warp = np.array([[1, 0, 0], [0, 1, 0]], np.float32)
+    valid_full = None
+    if exclude_mask is not None:
+        mask_bool = np.asarray(exclude_mask, bool)
+        if mask_bool.any():
+            valid_full = (~mask_bool).astype(np.uint8) * 255
+    for scale in scales:
+        size = (round(pre01.shape[1] * scale), round(pre01.shape[0] * scale))
+        template = cv2.resize(pre01, size, interpolation=cv2.INTER_AREA)
+        input_image = cv2.resize(post01, size, interpolation=cv2.INTER_AREA)
+        warp_level = warp.copy()
+        warp_level[:, 2] *= scale
+        mask_level = None
+        if valid_full is not None:
+            mask_level = cv2.resize(valid_full, size, interpolation=cv2.INTER_NEAREST)
+        criteria = (cv2.TERM_CRITERIA_COUNT | cv2.TERM_CRITERIA_EPS, iterations, eps)
+        _, warp_level = cv2.findTransformECC(template, input_image, warp_level,
+                                              cv2.MOTION_AFFINE, criteria, mask_level, 5)
+        warp = warp_level.copy()
+        warp[:, 2] /= scale
+    return warp.astype(np.float32)
+
+
+def estimate_affine_orb_ransac(pre01: np.ndarray, post01: np.ndarray, exclude_mask: np.ndarray = None,
+                               nfeatures: int = 12000, fast_threshold: int = 3, lowe_ratio: float = .72,
+                               ransac_reproj_threshold: float = 2.5) -> np.ndarray:
+    """ORB keypoints + Lowe-ratio matching + RANSAC affine fit. exclude_mask (True=exclude),
+    if given, is passed to ORB's detectAndCompute so keypoints are never taken from the
+    write-field-boundary band."""
+    a = np.uint8(np.clip(pre01 * 255, 0, 255))
+    b = np.uint8(np.clip(post01 * 255, 0, 255))
+    valid_mask = None if exclude_mask is None else (~np.asarray(exclude_mask, bool)).astype(np.uint8) * 255
+    detector = cv2.ORB_create(nfeatures=nfeatures, fastThreshold=fast_threshold)
+    ka, da = detector.detectAndCompute(a, valid_mask)
+    kb, db = detector.detectAndCompute(b, valid_mask)
+    if da is None or db is None:
+        raise RuntimeError("ORB descriptors unavailable")
+    pairs = cv2.BFMatcher(cv2.NORM_HAMMING).knnMatch(da, db, k=2)
+    good = [m for m, n in pairs if m.distance < lowe_ratio * n.distance]
+    if len(good) < 8:
+        raise RuntimeError(f"ORB matches insufficient: {len(good)}")
+    src = np.float32([ka[m.queryIdx].pt for m in good])
+    dst = np.float32([kb[m.trainIdx].pt for m in good])
+    warp, _ = cv2.estimateAffine2D(src, dst, method=cv2.RANSAC,
+                                    ransacReprojThreshold=ransac_reproj_threshold, maxIters=4000, confidence=.995)
+    if warp is None:
+        raise RuntimeError("ORB RANSAC affine fit failed")
+    return warp.astype(np.float32)
+
+
+PHASE2_DEFAULT_METHOD = "orb_ransac_affine"  # docs/MASKED_ALIGNMENT_FINAL_DECISION_20260916.md:
+# the only method that reaches 100% recovery at Position 6 across all real-scale translation,
+# rotation and scale scenarios once the write-field-boundary band is masked. ECC stays broken
+# on large real-scale translation (~26.8 px) even with the same mask applied, so it is not the
+# default; pass method="ecc_affine_pyramid" explicitly if a caller still needs it.
+
+
+def register_image_pair_affine(pre_raw: np.ndarray, post_raw: np.ndarray, method: str = None,
+                               exclude_mask="auto", **kwargs) -> np.ndarray:
+    """Phase 2 entry point: raw pre/post -> 2x3 affine warp (post -> pre).
+
+    method defaults to PHASE2_DEFAULT_METHOD; pass "orb_ransac_affine" or "ecc_affine_pyramid"
+    explicitly to override. exclude_mask defaults to "auto", which runs
+    shared.image_qc.bright_band_mask on pre_raw and uses that as the excluded region (the
+    write-field-boundary band found at Positions 6/7, docs/POSITION6_IMAGE_FORENSICS_20260916.md);
+    pass an explicit boolean array to use a different mask, or None to disable masking."""
+    method = method or PHASE2_DEFAULT_METHOD
+    if isinstance(exclude_mask, str) and exclude_mask == "auto":
+        from shared.image_qc import bright_band_mask
+        exclude_mask = bright_band_mask(pre_raw)
+    pre01, post01 = image01_for_registration(pre_raw), image01_for_registration(post_raw)
+    if method == "orb_ransac_affine":
+        return estimate_affine_orb_ransac(pre01, post01, exclude_mask=exclude_mask, **kwargs)
+    if method == "ecc_affine_pyramid":
+        return estimate_affine_ecc(pre01, post01, exclude_mask=exclude_mask, **kwargs)
+    raise ValueError(f"Unknown method: {method}")

@@ -8,5 +8,10 @@
 - `defect_masking.py`: 承認済みpre座標マスクの検証、post追随、3×3重なり判定
 - `analyzer.py`: 登録用ピーク座標の抽出
 - `qc_filter_v2.py`: 旧処理の安全側互換層。座標なしプレースホルダーや未完了レビューは拒否する
+- `image_qc.py`: pillar/field どちらにも依存しない生画像QC。Position 6・7で見つかった
+  基板書き込みフィールド境界の明部帯を検出する`bright_band_mask`と、撮影直後の
+  輝度統計から同じ問題を自動フラグする`saturation_qc`。詳細は
+  `docs/POSITION6_IMAGE_FORENSICS_20260916.md`と`docs/MASKED_ALIGNMENT_FINAL_DECISION_20260916.md`
+  を参照。`registration.py`の`register_image_pair_affine`から自動的に呼ばれる。
 
 一次記録未記載をクリーン扱いしていた旧処理の監査は `LEGACY_RECORD_ABSENCE_AUDIT.md` を参照する。
