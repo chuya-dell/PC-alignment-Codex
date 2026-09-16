@@ -127,6 +127,27 @@ Phase 1(溝検出+ICP点群位置合わせ)を呼んでおり、今回は変更�
 比較表・ECCマスク実装で踏んだ落とし穴は
 [`docs/MASKED_ALIGNMENT_FINAL_DECISION_20260916.md`](docs/MASKED_ALIGNMENT_FINAL_DECISION_20260916.md) を参照。
 
+## マスクベンチマークの評価方法検証、Phase 1/Phase 2の切り分け（2026-09-17）
+
+上記の「回収率100%」がスパイク評価方法のアーティファクトでないかを検証した。
+半合成スパイクはマスク領域も含めて一様配置されており、当初の実装はマスク領域内の
+スパイクを評価対象から除外していたが、**除外せず画像全体を評価しても、マスク適用
+ORB/RANSACの回収率は99.0〜100.0%を維持した**（最大1ポイント差）。標準方式の
+選定は変わらない。`field_run_masked_benchmark.py`のスコアリングも除外なし方式へ
+修正し、比較表の数値を更新した。
+
+Phase 1(`pillar_level/v1`が使う`align_and_match_dataframes`、溝検出+ICP)と
+Phase 2(`register_image_pair_affine`)の役割を確認した。**これまでの濃度依存性解析
+(260826・260827・260828の日程横断比較等)は全てPhase 1のみを通っており、Phase 2を
+呼ぶ本番コードは存在しない。** さらに追加確認として、Phase 1自身の溝検出をPosition 6で
+実行したところ、**縦シフトdy=84.8pxという物理的にあり得ない値**を検出した(実データの
+妥当範囲は約−8〜+20px)。対応点マッチ率もPosition 1の85.1%に対し75.9%と低い。
+**Phase 2側は対策済みだが、本番で使われているPhase 1側がPosition 6で問題を
+抱えている可能性があり、これは今回まで未検証だった。** Phase 2の知見を本番解析へ
+反映するには、入出力の型の違い(座標データフレーム vs 生画像→アフィン行列)を解消する
+設計と、Phase 1自身のPosition 6問題の検証が別途必要。詳細は
+[`docs/MASKED_SCORING_AND_PIPELINE_VERIFICATION_20260916.md`](docs/MASKED_SCORING_AND_PIPELINE_VERIFICATION_20260916.md) を参照。
+
 自動候補は欠陥として採用されない。pre/post双方の目視確認、承認者、承認日、pre画像ネイティブ画素座標のポリゴンが揃った承認行だけが解析へ流れる。
 
 ## 他チャットからの保存

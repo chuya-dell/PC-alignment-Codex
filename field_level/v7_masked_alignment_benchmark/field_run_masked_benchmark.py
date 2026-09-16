@@ -160,8 +160,11 @@ def main():
                 truth = sample_truth(pre01.shape, count, np.random.default_rng(c['seed'] + pos * 1000 + count))
                 mov = inject(base, truth, gt, c['spike_amplitude_normalized'], c['spike_sigma_px'])
                 for name, m in estimates.items():
-                    recovered, n_truth, total, fp = detect_and_score(pre01, mov, m, truth, c['match_radius_px'],
-                                                                       score_mask=mask)
+                    # score_mask intentionally omitted: docs/MASKED_SCORING_AND_PIPELINE_VERIFICATION_20260916.md
+                    # found that excluding mask-interior truth spikes from the denominator was not
+                    # inflating the reported recovery rate (99.0-100.0% either way), but scoring the
+                    # full frame is still the more honest default going forward.
+                    recovered, n_truth, total, fp = detect_and_score(pre01, mov, m, truth, c['match_radius_px'])
                     rows.append({'position': pos, 'method': name, 'scenario': a.scenario, 'masked': masked,
                                  'spike_count': count, 'evaluated_truth_count': n_truth,
                                  'recovered_count': recovered, 'recovery_rate': recovered / max(n_truth, 1),
