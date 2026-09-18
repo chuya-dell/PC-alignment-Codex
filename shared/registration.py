@@ -4,6 +4,10 @@ The advanced registration history belongs to this module.  The returned
 transform retains the complete quadratic model so that forward alignment and
 inverse grid projection use the same geometry.
 """
+from dataclasses import dataclass
+import math
+import warnings
+
 import numpy as np
 import cv2
 import pandas as pd
@@ -464,22 +468,149 @@ PHASE2_DEFAULT_METHOD = "orb_ransac_affine"  # docs/MASKED_ALIGNMENT_FINAL_DECIS
 # default; pass method="ecc_affine_pyramid" explicitly if a caller still needs it.
 
 
+@dataclass(frozen=True)
+class AffineQCThresholds:
+    """Acceptance bounds for a physical pre/post microscope-image transform.
+
+    These bounds are deliberately much wider than the 2026-09-01 reference
+    motion range (about -27..+10 px x and -8..+20 px y), but tighter than the
+    former 150 px / 10 % degenerate-transform screen.  They were calibrated
+    against the 382 successful 2026-09-17 production-pair comparison: all 376
+    pairs not previously classified as degenerate pass, while all six
+    numerically recorded degenerate pairs fail.  See
+    docs/PHASE2_TRANSFORM_QC_GATE_20260918.md.
+    """
+
+    max_center_translation_px: float = 125.0
+    max_rotation_deg: float = 3.0
+    min_scale: float = 0.93
+    max_scale: float = 1.05
+    max_anisotropy: float = 1.10
+
+
+class AffineTransformQCError(RuntimeError):
+    """Raised when a Phase-2 affine result is not safe for downstream use."""
+
+    def __init__(self, diagnostics: dict):
+        self.diagnostics = diagnostics
+        reasons = "; ".join(diagnostics["reasons"])
+        super().__init__(f"Phase-2 affine transform rejected by QC: {reasons}")
+
+
+def assess_affine_transform_qc(warp: np.ndarray, image_shape, *,
+                               thresholds: AffineQCThresholds = None) -> dict:
+    """Decompose and validate a 2x3 affine transform without changing it.
+
+    Translation is measured at the image centre, rather than reading the
+    offset column directly: scale and rotation otherwise make that value depend
+    on the chosen coordinate origin.  ``image_shape`` is the numpy ``(h, w)``
+    shape of the source image.  The returned diagnostics are serialisable and
+    are intentionally suitable for a batch QC ledger.
+    """
+    thresholds = thresholds or AffineQCThresholds()
+    matrix = np.asarray(warp, dtype=float)
+    reasons = []
+    if matrix.shape != (2, 3):
+        return {
+            "accepted": False, "reasons": [f"matrix shape {matrix.shape}, expected (2, 3)"],
+            "dx_center_px": np.nan, "dy_center_px": np.nan,
+            "rotation_deg": np.nan, "scale": np.nan, "anisotropy": np.nan,
+        }
+    if len(image_shape) < 2:
+        raise ValueError("image_shape must contain height and width.")
+    if not np.isfinite(matrix).all():
+        return {
+            "accepted": False, "reasons": ["matrix contains non-finite values"],
+            "dx_center_px": np.nan, "dy_center_px": np.nan,
+            "rotation_deg": np.nan, "scale": np.nan, "anisotropy": np.nan,
+        }
+
+    linear, translation = matrix[:, :2], matrix[:, 2]
+    centre = np.array([(float(image_shape[1]) - 1.0) / 2.0,
+                       (float(image_shape[0]) - 1.0) / 2.0])
+    mapped_centre = linear @ centre + translation
+    displacement = mapped_centre - centre
+    determinant = float(np.linalg.det(linear))
+    singular_values = np.linalg.svd(linear, compute_uv=False)
+    scale = float(math.sqrt(abs(determinant)))
+    rotation_deg = float(math.degrees(math.atan2(linear[1, 0], linear[0, 0])))
+    anisotropy = float(np.inf if singular_values[-1] == 0 else singular_values[0] / singular_values[-1])
+
+    if determinant <= 0:
+        reasons.append(f"non-positive determinant ({determinant:.6g})")
+    if abs(displacement[0]) > thresholds.max_center_translation_px:
+        reasons.append(f"|dx_center|={abs(displacement[0]):.3f}px exceeds {thresholds.max_center_translation_px:g}px")
+    if abs(displacement[1]) > thresholds.max_center_translation_px:
+        reasons.append(f"|dy_center|={abs(displacement[1]):.3f}px exceeds {thresholds.max_center_translation_px:g}px")
+    if abs(rotation_deg) > thresholds.max_rotation_deg:
+        reasons.append(f"|rotation|={abs(rotation_deg):.3f}deg exceeds {thresholds.max_rotation_deg:g}deg")
+    if not thresholds.min_scale <= scale <= thresholds.max_scale:
+        reasons.append(f"scale={scale:.6f} outside [{thresholds.min_scale:g}, {thresholds.max_scale:g}]")
+    if anisotropy > thresholds.max_anisotropy:
+        reasons.append(f"anisotropy={anisotropy:.6f} exceeds {thresholds.max_anisotropy:g}")
+    return {
+        "accepted": not reasons,
+        "reasons": reasons,
+        "dx_center_px": float(displacement[0]),
+        "dy_center_px": float(displacement[1]),
+        "rotation_deg": rotation_deg,
+        "scale": scale,
+        "anisotropy": anisotropy,
+        "determinant": determinant,
+        "thresholds": thresholds,
+    }
+
+
 def register_image_pair_affine(pre_raw: np.ndarray, post_raw: np.ndarray, method: str = None,
-                               exclude_mask="auto", **kwargs) -> np.ndarray:
+                               exclude_mask="auto", *, qc: bool = True,
+                               qc_thresholds: AffineQCThresholds = None,
+                               return_qc: bool = False,
+                               mask_coverage_warning_fraction: float = .50,
+                               **kwargs) -> np.ndarray:
     """Phase 2 entry point: raw pre/post -> 2x3 affine warp (post -> pre).
 
     method defaults to PHASE2_DEFAULT_METHOD; pass "orb_ransac_affine" or "ecc_affine_pyramid"
     explicitly to override. exclude_mask defaults to "auto", which runs
     shared.image_qc.bright_band_mask on pre_raw and uses that as the excluded region (the
     write-field-boundary band found at Positions 6/7, docs/POSITION6_IMAGE_FORENSICS_20260916.md);
-    pass an explicit boolean array to use a different mask, or None to disable masking."""
+    pass an explicit boolean array to use a different mask, or None to disable masking.
+
+    By default the estimated matrix must pass ``assess_affine_transform_qc``;
+    a rejected transform raises ``AffineTransformQCError`` before it can reach
+    contrast sampling or statistics. Set ``qc=False`` only for a deliberate
+    diagnostic comparison. ``return_qc=True`` returns ``(warp, diagnostics)``
+    for accepted transforms. No Phase-1 fallback is attempted because that path
+    has independently documented registration failures.
+
+    A mask covering more than ``mask_coverage_warning_fraction`` of the image
+    emits a warning. It does not itself reject an otherwise valid transform,
+    but makes ORB feature starvation explicit in batch logs.
+    """
     method = method or PHASE2_DEFAULT_METHOD
     if isinstance(exclude_mask, str) and exclude_mask == "auto":
         from shared.image_qc import bright_band_mask
         exclude_mask = bright_band_mask(pre_raw)
+    if exclude_mask is not None:
+        mask = np.asarray(exclude_mask, dtype=bool)
+        if mask.shape != np.asarray(pre_raw).shape:
+            raise ValueError("exclude_mask must have the same shape as pre_raw.")
+        mask_fraction = float(mask.mean())
+        if mask_fraction > mask_coverage_warning_fraction:
+            warnings.warn(
+                f"Registration mask covers {mask_fraction:.1%} of the image; "
+                "ORB feature starvation is possible.", RuntimeWarning, stacklevel=2,
+            )
+    else:
+        mask_fraction = 0.0
     pre01, post01 = image01_for_registration(pre_raw), image01_for_registration(post_raw)
     if method == "orb_ransac_affine":
-        return estimate_affine_orb_ransac(pre01, post01, exclude_mask=exclude_mask, **kwargs)
-    if method == "ecc_affine_pyramid":
-        return estimate_affine_ecc(pre01, post01, exclude_mask=exclude_mask, **kwargs)
-    raise ValueError(f"Unknown method: {method}")
+        warp = estimate_affine_orb_ransac(pre01, post01, exclude_mask=exclude_mask, **kwargs)
+    elif method == "ecc_affine_pyramid":
+        warp = estimate_affine_ecc(pre01, post01, exclude_mask=exclude_mask, **kwargs)
+    else:
+        raise ValueError(f"Unknown method: {method}")
+    diagnostics = assess_affine_transform_qc(warp, pre_raw.shape, thresholds=qc_thresholds)
+    diagnostics.update(method=method, mask_fraction=mask_fraction)
+    if qc and not diagnostics["accepted"]:
+        raise AffineTransformQCError(diagnostics)
+    return (warp, diagnostics) if return_qc else warp

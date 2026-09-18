@@ -13,5 +13,9 @@
   輝度統計から同じ問題を自動フラグする`saturation_qc`。詳細は
   `docs/POSITION6_IMAGE_FORENSICS_20260916.md`と`docs/MASKED_ALIGNMENT_FINAL_DECISION_20260916.md`
   を参照。`registration.py`の`register_image_pair_affine`から自動的に呼ばれる。
+- `registration.py`: Phase 2の`register_image_pair_affine`は、推定アフィンを下流へ渡す前に
+  `assess_affine_transform_qc`で物理的妥当性を検査する。これはピラー・視野のどちらにも
+  共通する登録安全境界なので`shared/`に置く。既定では中心変位125 px、回転3度、
+  等方スケール0.93--1.05、異方性1.10を超える変換を例外として拒否する。
 
 一次記録未記載をクリーン扱いしていた旧処理の監査は `LEGACY_RECORD_ABSENCE_AUDIT.md` を参照する。
