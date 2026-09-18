@@ -37,3 +37,16 @@ Use `field_level/v8_phase2_transform_qc/field_validate_phase2_transform_qc.py` w
 saved comparison CSV. It is a scalar-metric regression test, not a rerun of the 382 image
 registrations. The 382-row CSV contains six rows satisfying its stated old numerical screen;
 the often-cited eight refers to the separate 394-row downstream recomputation population.
+
+## Real-image entry-point smoke test
+
+`field_smoke_test_phase2_qc.py` calls `register_image_pair_affine` itself and catches
+`AffineTransformQCError` as `registration_qc_rejected`, which is the required contract for a
+future batch caller.  On 2026-09-18, the two rows present only in the 394-row recomputation
+were rerun from their TIFFs: 260824 SHC6OH Sample12-P4 was rejected (centre dx=520.372 px,
+dy=-899.182 px, scale=0.036591, anisotropy=1450.882); 260826 SAM Sample10-P4 was rejected
+(dx=-356.248 px, dy=-748.382 px, rotation=-25.070 deg, scale=0.050000, anisotropy=3.851).
+Two normal controls (260824 SHC6OH Sample1-P1 and 260826 SAM Sample1-P1) returned accepted
+matrices without exceptions.  Together with the earlier six-row scalar regression, coverage
+is 8/8 known degenerate cases rejected; the two newly located cases have additionally passed
+the real entry-point integration test.

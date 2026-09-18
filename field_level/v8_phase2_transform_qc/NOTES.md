@@ -11,6 +11,14 @@ CSVには元行列ではなく中心変位・回転・等方スケールだけ�
 実行結果はGit管理外の指定`--out-dir`に、行単位CSVと要約CSVとして保存する。2026-09-18の
 結果はGoogle DriveおよびObsidian `06_解析`に保存する。
 
+`field_smoke_test_phase2_qc.py`は実TIFFからPhase2を呼び、`AffineTransformQCError`を
+`registration_qc_rejected`としてCSVへ記録するバッチ呼び出し例である。現在の本番経路には
+Phase2呼び出し側が未実装なので、本スクリプトは統合動作の参照実装に留める。
+
+2026-09-18の実画像スモークテストでは、382組CSV外の退化2組（260824 SHC6OH S12-P4、
+260826 SAM S10-P4）をいずれも`registration_qc_rejected`として拒否した。正常対照の
+260824 SHC6OH S1-P1と260826 SAM S1-P1はともに`ok`だった。
+
 ## 既知の問題
 
 CSVに記録された旧150 px/10%退化条件は6組であり、関連レポートにある8組とは母集団が異なる。
