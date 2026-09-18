@@ -17,5 +17,9 @@
   `assess_affine_transform_qc`で物理的妥当性を検査する。これはピラー・視野のどちらにも
   共通する登録安全境界なので`shared/`に置く。既定では中心変位125 px、回転3度、
   等方スケール0.93--1.05、異方性1.10を超える変換を例外として拒否する。
+- `concentration_series_stats.py`: Blank閾値（プールしたBlank格子点コントラスト差分の
+  `mean - 3*std`）とFOV単位exact Mann-Whitney検定。`PC-alignment-anti`（参照のみ、
+  変更なし）の`investigation/260907_pipeline_rebuild/scripts/run_fov_level_direct_sampling.py`
+  を読み取って書き直した。`field_level/v9_phase2_production_reanalysis`から使う。
 
 一次記録未記載をクリーン扱いしていた旧処理の監査は `LEGACY_RECORD_ABSENCE_AUDIT.md` を参照する。

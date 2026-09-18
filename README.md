@@ -170,6 +170,32 @@ Position 2・3・4・8と同程度の「書き込みフィールド境界の影�
 
 自動候補は欠陥として採用されない。pre/post双方の目視確認、承認者、承認日、pre画像ネイティブ画素座標のポリゴンが揃った承認行だけが解析へ流れる。
 
+## Phase 2 QCゲート(2026-09-18)
+
+`register_image_pair_affine`が推定アフィンを`assess_affine_transform_qc`で検査し、
+不合格なら`AffineTransformQCError`を送出するようになった。382組比較CSVの旧150 px/
+10%退化条件6組全て、および実TIFFで見つかった追加2組(合計8/8)を正しく拒否する一方、
+非退化376組は全て通過する。詳細は
+[`docs/PHASE2_TRANSFORM_QC_GATE_20260918.md`](docs/PHASE2_TRANSFORM_QC_GATE_20260918.md) を参照。
+
+## Phase 2(QCゲート込み)による本番濃度依存性解析の一気通貫再実行（2026-09-18）
+
+`PC-alignment-anti`(参照のみ、コード変更なし)からFFT格子生成・Blank閾値・FOV単位
+Mann-Whitney検定のロジックを読み取って`PC-alignment-Codex`側に書き直し(出典明記)、
+Phase 2(QCゲート込み)と組み合わせた新エントリポイント
+[`field_run_phase2_production_reanalysis.py`](field_level/v9_phase2_production_reanalysis/field_run_phase2_production_reanalysis.py)を
+824〜829の6日程・409組全件(8日程×modality分の全試行)で実行した。**6つの正本日程
+全てで、n_high・n_blank・Mann-Whitney両側exact p値が、2026-09-17の使い捨てPhase 2
+代入再計算と完全一致した。** 260825_DNAは両側exact p=0.053030(有意境界のすぐ外側)、
+片側検定により実際の方向はBlank>Sample1と確認され、既存の慎重な解釈(要フォロー
+アップ日程)を維持する。
+
+依頼が前提とした「382組」は、2026-09-17比較実行時にPhase 1側も成功した行だけを
+残した派生CSVの行数であり、Phase 1が失敗したがPhase 2単独なら登録できるペアを
+暗黙に落としていた(本タスクが切り離したいPhase 1依存そのもの)。そのためフィルタ前の
+409行(全試行)を入力に切り替えて初めて、6日程全てで参照値と完全一致した。詳細は
+[`docs/PHASE2_PRODUCTION_REANALYSIS_20260918.md`](docs/PHASE2_PRODUCTION_REANALYSIS_20260918.md) を参照。
+
 ## 他チャットからの保存
 
 取り込み済み成果とその出所は [`data/raw/artifact_provenance_registry.csv`](data/raw/artifact_provenance_registry.csv) に記録する。作成日時は出所の手掛かりに留め、内容・パラメータ・検証結果の比較が済むまで、どちらが新しいかを判定しない。
