@@ -22,5 +22,16 @@ class Metrics(unittest.TestCase):
     def test_identical(self):
         m=truth_matrix((2044,2048),(-27,20,-.2,.99))
         for value in errors(m,m,(2044,2048)).values(): self.assertAlmostEqual(value,0)
+    def test_independent_real_residual_direction(self):
+        from field_real_precision import residuals
+        rng=np.random.default_rng(93)
+        a=cv2.GaussianBlur(rng.uniform(8000,40000,(512,512)).astype(np.float32),(0,0),1)
+        truth=truth_matrix(a.shape,(3,-2,0,1))
+        b=cv2.warpAffine(a,truth,(512,512),borderMode=cv2.BORDER_REFLECT_101)
+        bad=truth.copy(); bad[:,2]+=[1,-1]
+        wrong,right=residuals(a,b,[bad,truth])
+        self.assertLess(right['photometric_residual'],wrong['photometric_residual'])
+        self.assertLess(right['phase_median_px'],wrong['phase_median_px'])
+        self.assertEqual(right['n_common_phase_tiles'],wrong['n_common_phase_tiles'])
 
 if __name__=='__main__': unittest.main()
