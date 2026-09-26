@@ -1,0 +1,29 @@
+{
+  "round": 1,
+  "commit": "641e5f5b38d6f7453a94e85706b304aa8ec3f7df",
+  "runner": "python -m unittest discover -s pillar_level/v2_hex_group7/tests -v (pytest unavailable in this environment)",
+  "passed": 10,
+  "failed": 0,
+  "failed_tests": [],
+  "requirement_coverage": {
+    "R-01": [
+      "test_r01_interior_boundary_overlap_rotation",
+      "test_hole_never_replaced_by_second_shell",
+      "test_empty_and_tiny_fields_have_stable_schema",
+      "test_ambiguous_and_nonhex_neighbours_excluded",
+      "test_shuffled_rows_preserve_identified_groups",
+      "test_bad_inputs_rejected"
+    ],
+    "R-02": [
+      "test_r02_hand_calculated_field",
+      "test_missing_and_invalid_metrics_do_not_shrink_group"
+    ],
+    "R-03": [
+      "test_r03_existing_analysis_exact_before_after_and_output_protection"
+    ],
+    "R-04": [
+      "test_r03_existing_analysis_exact_before_after_and_output_protection",
+      "test_command_line"
+    ]
+  }
+}
