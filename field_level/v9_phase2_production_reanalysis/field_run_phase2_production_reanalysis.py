@@ -62,6 +62,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from shared import registration as reg
+from shared.image_qc import bright_band_mask
 from shared.lattice_indexing import lattice_from_fft
 from shared.theoretical_grid_evaluation import sample_grid_features
 from shared.concentration_series_stats import blank_threshold, fov_exceeds_rate_mann_whitney
@@ -100,11 +101,18 @@ def process_pair(row, pitch: float) -> tuple[dict, np.ndarray | None]:
                 "anisotropy": qc["anisotropy"], "mask_fraction": qc.get("mask_fraction"),
                 "qc_reasons": "; ".join(qc["reasons"]),
             }, None
+        # Reuse the write-field mask on both native images. The registration
+        # QC gate uses this same pre-image mask; the post mask is evaluated in
+        # post coordinates after projecting the pre grid through the affine.
+        pre_invalid_mask = bright_band_mask(pre)
+        post_invalid_mask = bright_band_mask(post)
         lattice = lattice_from_fft(pre, pitch)
-        grid = sample_grid_features(pre, lattice, margin=GRID_MARGIN)
+        grid = sample_grid_features(pre, lattice, margin=GRID_MARGIN,
+                                    invalid_mask=pre_invalid_mask)
         pre_xy = grid[["x", "y"]].to_numpy(dtype=np.float32)[None, :, :]
         post_xy = cv2.transform(pre_xy, warp)[0]
-        post_sample = reg.sample_contrast(post, post_xy)
+        post_sample = reg.sample_contrast(post, post_xy,
+                                          invalid_mask=post_invalid_mask)
         valid = (grid["valid_sampling"].to_numpy() & post_sample["valid_sampling"].to_numpy()
                  & np.isfinite(grid["contrast"].to_numpy()) & np.isfinite(post_sample["contrast"].to_numpy()))
         delta = (post_sample["contrast"].to_numpy() - grid["contrast"].to_numpy())[valid]

@@ -36,6 +36,19 @@ FOV単位exact Mann-Whitney集計）は、これまで位置合わせだけを�
 `AffineTransformQCError`が送出されたFOV/サンプル対は`registration_qc_rejected`として記録し、
 以降のBlank閾値・Mann-Whitney計算から除外する。
 
+### 2026-09-26: サンプリングへの明部帯マスク適用
+
+`register_image_pair_affine`の前処理と同じ`bright_band_mask`を前・後の生画像に適用する。
+前画像のFFT格子特徴量抽出は`sample_grid_features(..., invalid_mask=pre_invalid_mask)`へ渡し、
+後画像は前格子をアフィン変換した後、`sample_contrast(..., invalid_mask=post_invalid_mask)`へ渡す。
+いずれも3×3サンプリング領域がマスクと重なる格子点を無効にする。
+前後いずれかで無効となった点は下流の差分・Blank閾値・閾値超過率から除外する。
+
+小規模な模擬画像確認では、前画像の横帯と後画像の縦帯の両方で無効領域を作り、9格子点中4点だけが
+有効として残ることを確認した。これは呼び出しとマスク伝播の確認であり、科学的な性能評価ではない。
+409組の正式な再解析は別ディレクトリへ保存して実行する。入力となる409組マニフェストと既存暫定結果、
+指定Google Drive保存先へのアクセスを確認できた後に行う。
+
 ## 入力
 
 382組の対象ペア（pre/postパス、dataset/sample/position/concentration/is_blank）は、
