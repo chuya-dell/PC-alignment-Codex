@@ -75,6 +75,22 @@ def fov_key(row) -> str:
     return f"{row.dataset}_{row.sample}_{row.position}"
 
 
+def _mask_overlap_flags(coords: np.ndarray, invalid_mask: np.ndarray) -> np.ndarray:
+    """Return samples whose rounded 3x3 footprint intersects an invalid mask."""
+    coords = np.asarray(coords, dtype=float)
+    invalid_mask = np.asarray(invalid_mask, dtype=bool)
+    if invalid_mask.ndim != 2:
+        raise ValueError("invalid_mask must be a two-dimensional image.")
+    dilated = cv2.dilate(invalid_mask.astype(np.uint8), np.ones((3, 3), np.uint8))
+    finite = np.isfinite(coords).all(axis=1)
+    x, y = np.rint(np.where(finite[:, None], coords, 0)).astype(int).T
+    height, width = invalid_mask.shape
+    inside = finite & (x >= 0) & (x < width) & (y >= 0) & (y < height)
+    overlaps = np.zeros(len(coords), dtype=bool)
+    overlaps[inside] = dilated[y[inside], x[inside]] != 0
+    return overlaps
+
+
 def process_pair(row, pitch: float) -> tuple[dict, np.ndarray | None]:
     """Register one pre/post pair with Phase 2 and sample the pre-image FFT grid.
 
@@ -90,22 +106,28 @@ def process_pair(row, pitch: float) -> tuple[dict, np.ndarray | None]:
         post = reg.load_image_unicode(row.post_path)
         if pre is None or post is None or pre.shape != post.shape:
             return {**base, "status": "error", "error": "image load failed or shape mismatch"}, None
+        pre_invalid_mask = bright_band_mask(pre)
+        post_invalid_mask = bright_band_mask(post)
+        mask_summary = {
+            "pre_mask_pixels": int(pre_invalid_mask.sum()),
+            "pre_mask_fraction": float(pre_invalid_mask.mean()),
+            "post_mask_pixels": int(post_invalid_mask.sum()),
+            "post_mask_fraction": float(post_invalid_mask.mean()),
+        }
         try:
             warp, qc = reg.register_image_pair_affine(pre, post, return_qc=True)
         except reg.AffineTransformQCError as exc:
             qc = exc.diagnostics
             return {
-                **base, "status": "registration_qc_rejected", "error": str(exc),
+                **base, **mask_summary,
+                "status": "registration_qc_rejected", "error": str(exc),
                 "dx_center_px": qc["dx_center_px"], "dy_center_px": qc["dy_center_px"],
                 "rotation_deg": qc["rotation_deg"], "scale": qc["scale"],
                 "anisotropy": qc["anisotropy"], "mask_fraction": qc.get("mask_fraction"),
                 "qc_reasons": "; ".join(qc["reasons"]),
             }, None
-        # Reuse the write-field mask on both native images. The registration
-        # QC gate uses this same pre-image mask; the post mask is evaluated in
-        # post coordinates after projecting the pre grid through the affine.
-        pre_invalid_mask = bright_band_mask(pre)
-        post_invalid_mask = bright_band_mask(post)
+        # The registration QC gate uses this same pre-image mask; the post
+        # mask is evaluated in post coordinates after affine projection.
         lattice = lattice_from_fft(pre, pitch)
         grid = sample_grid_features(pre, lattice, margin=GRID_MARGIN,
                                     invalid_mask=pre_invalid_mask)
@@ -113,12 +135,19 @@ def process_pair(row, pitch: float) -> tuple[dict, np.ndarray | None]:
         post_xy = cv2.transform(pre_xy, warp)[0]
         post_sample = reg.sample_contrast(post, post_xy,
                                           invalid_mask=post_invalid_mask)
+        pre_masked = _mask_overlap_flags(pre_xy[0], pre_invalid_mask)
+        post_masked = _mask_overlap_flags(post_xy, post_invalid_mask)
+        mask_invalid = pre_masked | post_masked
         valid = (grid["valid_sampling"].to_numpy() & post_sample["valid_sampling"].to_numpy()
                  & np.isfinite(grid["contrast"].to_numpy()) & np.isfinite(post_sample["contrast"].to_numpy()))
         delta = (post_sample["contrast"].to_numpy() - grid["contrast"].to_numpy())[valid]
         summary = {
             **base, "status": "ok", "error": "",
             "n_grid_points": int(len(grid)), "n_valid": int(valid.sum()),
+            **mask_summary,
+            "pre_masked_grid_points": int(pre_masked.sum()),
+            "post_masked_grid_points": int(post_masked.sum()),
+            "mask_invalid_grid_points_union": int(mask_invalid.sum()),
             "delta_mean": float(delta.mean()) if delta.size else float("nan"),
             "dx_center_px": qc["dx_center_px"], "dy_center_px": qc["dy_center_px"],
             "rotation_deg": qc["rotation_deg"], "scale": qc["scale"],
