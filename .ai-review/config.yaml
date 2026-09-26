@@ -1,0 +1,7 @@
+max_rounds: 3
+escalation_triggers:
+  same_rejection_pattern_count: 3
+  high_severity_security_finding: true
+  requirement_ambiguity_flagged: true
+requirement_traceability_required: true
+reconciler: deterministic_script   # モデルに委任しない
