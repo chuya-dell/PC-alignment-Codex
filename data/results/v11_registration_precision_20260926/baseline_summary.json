@@ -1,0 +1,22 @@
+{
+  "stage": "baseline",
+  "n": 452,
+  "success": 452,
+  "failed": 0,
+  "center_error_px_mean": 0.10301784368808839,
+  "center_error_px_median": 0.05551593264479545,
+  "center_error_px_p95": 0.2581216209896028,
+  "center_error_px_max": 5.441420920270685,
+  "rotation_edge_error_px_mean": 0.07289836899649962,
+  "rotation_edge_error_px_median": 0.037773928740616,
+  "rotation_edge_error_px_p95": 0.2213664312361084,
+  "rotation_edge_error_px_max": 2.284322161833246,
+  "scale_edge_error_px_mean": 0.0810387924299833,
+  "scale_edge_error_px_median": 0.0360348047944698,
+  "scale_edge_error_px_p95": 0.26005854674753065,
+  "scale_edge_error_px_max": 4.246354966780974,
+  "grid_rmse_px_mean": 0.15570226760104566,
+  "grid_rmse_px_median": 0.0893459607637363,
+  "grid_rmse_px_p95": 0.36424560104682324,
+  "grid_rmse_px_max": 6.829086306371224
+}

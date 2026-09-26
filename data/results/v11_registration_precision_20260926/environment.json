@@ -1,0 +1,12 @@
+{
+  "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+  "opencv": "5.0.0",
+  "numpy": "2.5.3",
+  "scipy": "1.18.1",
+  "base_commit": "fadcfda",
+  "benchmark_commit": "4a18503acd148ea3d0376e9b6f41144ab565fe40",
+  "seed": 20260926,
+  "pitch_px": 7.286,
+  "direction": "pre_to_post",
+  "renderer": "INTER_LINEAR; BORDER_REFLECT_101"
+}
