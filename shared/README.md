@@ -23,3 +23,5 @@
   を読み取って書き直した。`field_level/v9_phase2_production_reanalysis`から使う。
 
 一次記録未記載をクリーン扱いしていた旧処理の監査は `LEGACY_RECORD_ABSENCE_AUDIT.md` を参照する。
+
+- `environment_check.py`: ピラー単位と視野単位の両方に共通する、依存パッケージ、生画像の読み込み、結果の書き込みを検証する。生データは変更しない。

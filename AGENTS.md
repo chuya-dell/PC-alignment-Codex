@@ -13,3 +13,7 @@
 9. 他チャット・他PCから成果を取り込む時、作成日時やファイル名だけで「新しい版」と判定しない。`data/raw/artifact_provenance_registry.csv` に出所、取得時点、内容、比較状態を記録し、関係が未確認なら `newness_status=unknown` の独立スナップショットとして保存する。
 
 詳細と例は `docs/REPOSITORY_CONVENTIONS.md` を参照する。
+
+## この準備環境の追加運用規則
+
+作業開始時は `docs/LOCAL_ENVIRONMENT_20260926.md` も読む。利用者の最新の運用指示を記載している。実験入力はFドライブ上の確認済みパス、生成物はこのクローンの `data/results/` を使用する。
