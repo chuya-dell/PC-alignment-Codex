@@ -54,7 +54,7 @@ Gitは導入済みの `C:\Program Files\Git\cmd\git.exe` を使用した。Pytho
 
 利用者の追加指示に基づき、準備用クローン専用のEd25519認証鍵を新規生成した。秘密鍵は `.git/codex-auth/id_ed25519` に置き、アクセス権を作成したWindows利用者とWindowsシステムに限定した。秘密鍵はGitで追跡されない。このクローンのフォルダ全体を第三者へ渡してはならない。
 
-公開鍵は次のとおり。GitHubのchuya-dellアカウントへの登録は本人に依頼済みで、登録確認まで認証と送信の成功は未確認である。
+公開鍵は次のとおり。GitHubのchuya-dellアカウントへの登録は本人が実施し、2026年9月26日に専用鍵による同アカウントへの認証成功を確認した。
 
 ```text
 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFW5S4cHrBdLfRtQp/j3TEZYCZZGi2pInpqqXqdp3FCL fdtdremote-codex-preparation
@@ -62,6 +62,6 @@ ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFW5S4cHrBdLfRtQp/j3TEZYCZZGi2pInpqqXqdp3FCL
 
 作成者名を `白石忠弥 (Codex)`、メールアドレスを既存クローンに設定されていた `chuya2816@gmail.com` とした。アカウントが指定と異なるため、このクローンの設定だけに適用し、利用者全体の設定は変更していない。メールアドレスのGitHub上での確認済み状態は調べていない。
 
-取得先は従来の暗号化されたウェブ接続、送信先は `git@github.com:chuya-dell/PC-alignment-Codex.git`。送信時は専用鍵を明示して使用する。鍵の登録後に認証・送信を確認し、必要に応じて取得先も同じ方式へ切り替える。fdtdremote側の鍵と利用者全体の設定は、実際にその利用者で作業できる環境で改めて用意する。
+取得先と送信先は `git@github.com:chuya-dell/PC-alignment-Codex.git`。専用鍵を明示して使用する。接続先の公開鍵はGitHub公式の[接続先公開鍵一覧](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/githubs-ssh-key-fingerprints)で確認し、専用の `.git/codex-auth/known_hosts` に保存した。fdtdremote側の鍵と利用者全体の設定は、実際にその利用者で作業できる環境で改めて用意する。
 
 作業開始時と送信直前に `git pull --ff-only` を実行する。履歴が分岐した場合は自動で上書きせず、内容を確認して競合を解消する。作業後は `git status` と差分を確認し、意味のある単位でコミットする。並行作業者には変更予定の範囲を事前に残す。
