@@ -65,12 +65,16 @@ def main():
     p.add_argument('--data-root',type=Path,required=True)
     p.add_argument('--output',type=Path,required=True)
     p.add_argument('--limit',type=int)
+    p.add_argument('--shards',type=int,default=1)
+    p.add_argument('--shard-index',type=int,default=0)
     a=p.parse_args(); a.output.mkdir(parents=True,exist_ok=True)
     cv2.setNumThreads(1)
     folders=['260824_p50_SHC6OH/Raw_Images_生データのみ','260825_p50_dna',
-             '260826-p50-sam','260827_pp50_dna','260828-p50-SAM','260829-p50-sam']
+             '260826-p50-sam','260827_pp50_dna','260828-p50-SAM','260829-p50-sam',
+             '260828-p50-dna','260829_p50_DNA']
     inputs=[(f,pos) for f in folders for pos in [1,6,7]]
     inputs += [('260826-p50-sam',p) for p in [2,5,8]]
+    inputs=[item for i,item in enumerate(inputs) if i%a.shards==a.shard_index]
     rows=[]; ledger=[]
     output=a.output/(a.stage+'.csv')
     done=pd.read_csv(output).to_dict('records') if output.exists() else []
