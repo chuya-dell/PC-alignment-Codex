@@ -25,3 +25,7 @@
 一次記録未記載をクリーン扱いしていた旧処理の監査は `LEGACY_RECORD_ABSENCE_AUDIT.md` を参照する。
 
 - `environment_check.py`: ピラー単位と視野単位の両方に共通する、依存パッケージ、生画像の読み込み、結果の書き込みを検証する。生データは変更しない。
+# Versioned precision refinement
+
+`v2_registration_precision/` contains opt-in affine refinement shared by pillar sampling
+and field-level evaluation; it has no analysis-granularity-specific statistics.
