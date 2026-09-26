@@ -1,0 +1,18 @@
+{
+  "total_pairs": 409,
+  "status_counts": {
+    "ok": 399,
+    "registration_qc_rejected": 10
+  },
+  "datasets": [
+    "260824_p50_SHC6OH",
+    "260825_p50_dna",
+    "260826_p50_sam",
+    "260827_p50_dna",
+    "260828_p50_dna",
+    "260828_p50_sam",
+    "260829_p50_dna",
+    "260829_p50_sam"
+  ],
+  "input_manifest": "attached 409-row pair_transform_comparison_20260917.csv"
+}
