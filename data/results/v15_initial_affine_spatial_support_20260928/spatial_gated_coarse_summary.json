@@ -1,0 +1,20 @@
+{
+  "n": 452,
+  "search_applied": 27,
+  "success": 452,
+  "improved_vs_current": 25,
+  "worse_vs_current": 2,
+  "unchanged_vs_current": 425,
+  "improved_vs_v11": 25,
+  "worse_vs_v11": 2,
+  "baseline_median": 0.0893459607637363,
+  "baseline_p95": 0.36424560104682324,
+  "baseline_max": 6.829086306371224,
+  "baseline_over_0_5": 13,
+  "baseline_over_1": 5,
+  "spatial_gated_median": 0.0880223654017078,
+  "spatial_gated_p95": 0.3042248631496759,
+  "spatial_gated_max": 0.5411806486392086,
+  "spatial_gated_over_0_5": 2,
+  "spatial_gated_over_1": 0
+}

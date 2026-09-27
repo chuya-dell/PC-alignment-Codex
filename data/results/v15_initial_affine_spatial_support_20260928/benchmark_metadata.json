@@ -1,0 +1,12 @@
+{
+  "created_local": "2026-09-28",
+  "case_count": 452,
+  "success_count": 452,
+  "rng_seed": 20260926,
+  "pitch_px": 7.286,
+  "source_root": "W:\\4.生データD_remo",
+  "opencv": "5.0.0",
+  "numpy": "2.5.3",
+  "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+  "selection": "primary inlier bbox coverage <0.70; evaluate Lowe 0.80 / RANSAC 2.5 and Lowe 0.72 / RANSAC 4.0; maximize bbox area times inlier fraction; apply alternate only if score exceeds primary"
+}
