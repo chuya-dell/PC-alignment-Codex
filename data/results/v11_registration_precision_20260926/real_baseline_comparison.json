@@ -1,0 +1,74 @@
+{
+  "total_pairs": 409,
+  "status_counts": {
+    "ok": 399,
+    "registration_qc_rejected": 10
+  },
+  "p_values_exactly_match_previous": true,
+  "datasets": [
+    {
+      "dataset": "260824_p50_SHC6OH",
+      "p_two_sided_exact_rerun": 0.662004662004662,
+      "p_one_sided_greater_exact_rerun": 0.331002331002331,
+      "p_two_sided_exact_previous": 0.662004662004662,
+      "p_one_sided_greater_exact_previous": 0.331002331002331,
+      "exact_match": true
+    },
+    {
+      "dataset": "260825_p50_dna",
+      "p_two_sided_exact_rerun": 0.1282051282051282,
+      "p_one_sided_greater_exact_rerun": 0.9513403263403264,
+      "p_two_sided_exact_previous": 0.1282051282051282,
+      "p_one_sided_greater_exact_previous": 0.9513403263403264,
+      "exact_match": true
+    },
+    {
+      "dataset": "260826_p50_sam",
+      "p_two_sided_exact_rerun": 1.0,
+      "p_one_sided_greater_exact_rerun": 0.625,
+      "p_two_sided_exact_previous": 1.0,
+      "p_one_sided_greater_exact_previous": 0.625,
+      "exact_match": true
+    },
+    {
+      "dataset": "260827_p50_dna",
+      "p_two_sided_exact_rerun": 0.5358197358197359,
+      "p_one_sided_greater_exact_rerun": 0.2679098679098679,
+      "p_two_sided_exact_previous": 0.5358197358197359,
+      "p_one_sided_greater_exact_previous": 0.2679098679098679,
+      "exact_match": true
+    },
+    {
+      "dataset": "260828_p50_dna",
+      "p_two_sided_exact_rerun": 0.3968919968919969,
+      "p_one_sided_greater_exact_rerun": 0.8321678321678321,
+      "p_two_sided_exact_previous": 0.3968919968919969,
+      "p_one_sided_greater_exact_previous": 0.8321678321678321,
+      "exact_match": true
+    },
+    {
+      "dataset": "260828_p50_sam",
+      "p_two_sided_exact_rerun": 0.7241647241647241,
+      "p_one_sided_greater_exact_rerun": 0.362082362082362,
+      "p_two_sided_exact_previous": 0.7241647241647241,
+      "p_one_sided_greater_exact_previous": 0.362082362082362,
+      "exact_match": true
+    },
+    {
+      "dataset": "260829_p50_dna",
+      "p_two_sided_exact_rerun": NaN,
+      "p_one_sided_greater_exact_rerun": NaN,
+      "p_two_sided_exact_previous": NaN,
+      "p_one_sided_greater_exact_previous": NaN,
+      "exact_match": true
+    },
+    {
+      "dataset": "260829_p50_sam",
+      "p_two_sided_exact_rerun": 0.5358197358197359,
+      "p_one_sided_greater_exact_rerun": 0.2679098679098679,
+      "p_two_sided_exact_previous": 0.5358197358197359,
+      "p_one_sided_greater_exact_previous": 0.2679098679098679,
+      "exact_match": true
+    }
+  ]
+}
