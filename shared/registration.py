@@ -437,12 +437,16 @@ def estimate_affine_ecc(pre01: np.ndarray, post01: np.ndarray, exclude_mask: np.
 def estimate_affine_orb_ransac(pre01: np.ndarray, post01: np.ndarray, exclude_mask: np.ndarray = None,
                                nfeatures: int = 12000, fast_threshold: int = 3, lowe_ratio: float = .72,
                                ransac_reproj_threshold: float = 2.5, *,
-                               exclude_mask_post: np.ndarray = None) -> np.ndarray:
+                               exclude_mask_post: np.ndarray = None,
+                               spatial_search: bool = True,
+                               min_spatial_support: float = .70) -> np.ndarray:
     """Fit pre-to-post coordinates with ORB + RANSAC.
 
     exclude_mask is in pre-image coordinates. If exclude_mask_post is supplied,
     it is applied in post-image coordinates; otherwise the pre mask is reused
-    for backward compatibility.
+    for backward compatibility. When spatial_search is enabled, the primary
+    fit is retained if its inliers span enough of the image; otherwise two
+    alternative ratio/threshold fits are scored by their inlier spatial support.
     """
     a = np.uint8(np.clip(pre01 * 255, 0, 255))
     b = np.uint8(np.clip(post01 * 255, 0, 255))
@@ -454,17 +458,56 @@ def estimate_affine_orb_ransac(pre01: np.ndarray, post01: np.ndarray, exclude_ma
     kb, db = detector.detectAndCompute(b, valid_mask_post)
     if da is None or db is None:
         raise RuntimeError("ORB descriptors unavailable")
+    if not 0.0 <= min_spatial_support <= 1.0:
+        raise ValueError("min_spatial_support must be between 0 and 1")
     pairs = cv2.BFMatcher(cv2.NORM_HAMMING).knnMatch(da, db, k=2)
-    good = [m for m, n in pairs if m.distance < lowe_ratio * n.distance]
-    if len(good) < 8:
-        raise RuntimeError(f"ORB matches insufficient: {len(good)}")
-    src = np.float32([ka[m.queryIdx].pt for m in good])
-    dst = np.float32([kb[m.trainIdx].pt for m in good])
-    warp, _ = cv2.estimateAffine2D(src, dst, method=cv2.RANSAC,
-                                    ransacReprojThreshold=ransac_reproj_threshold, maxIters=4000, confidence=.995)
-    if warp is None:
-        raise RuntimeError("ORB RANSAC affine fit failed")
-    return warp.astype(np.float32)
+    specifications = [(lowe_ratio, ransac_reproj_threshold)]
+
+    def fit(ratio, threshold):
+        good = [m for m, n in pairs if m.distance < ratio * n.distance]
+        if len(good) < 8:
+            return None
+        src = np.float32([ka[m.queryIdx].pt for m in good])
+        dst = np.float32([kb[m.trainIdx].pt for m in good])
+        warp, inliers = cv2.estimateAffine2D(
+            src, dst, method=cv2.RANSAC, ransacReprojThreshold=threshold,
+            maxIters=4000, confidence=.995,
+        )
+        if warp is None or inliers is None:
+            return None
+        selected = inliers.ravel() != 0
+        if not selected.any():
+            return None
+        span = np.ptp(src[selected], axis=0)
+        coverage = float(span[0] * span[1] / (pre01.shape[0] * pre01.shape[1]))
+        score = float(span[0] * span[1] * selected.mean())
+        return {"warp": warp.astype(np.float32), "coverage": coverage, "score": score}
+
+    primary = fit(*specifications[0])
+    if not spatial_search:
+        if primary is None:
+            raise RuntimeError("ORB matches insufficient or RANSAC affine fit failed")
+        return primary["warp"]
+    if primary is None or primary["coverage"] >= min_spatial_support:
+        if primary is None:
+            # Give the two fallback hypotheses a chance to recover a fit when
+            # the default Lowe ratio leaves too few usable correspondences.
+            specifications.extend(((.80, ransac_reproj_threshold),
+                                   (lowe_ratio, max(4.0, ransac_reproj_threshold))))
+        else:
+            return primary["warp"]
+    else:
+        specifications.extend(((.80, ransac_reproj_threshold),
+                               (lowe_ratio, max(4.0, ransac_reproj_threshold))))
+
+    candidates = [primary] if primary is not None else []
+    for ratio, threshold in specifications[1:]:
+        candidate = fit(ratio, threshold)
+        if candidate is not None:
+            candidates.append(candidate)
+    if not candidates:
+        raise RuntimeError("ORB matches insufficient or RANSAC affine fit failed")
+    return max(candidates, key=lambda item: item["score"])["warp"]
 
 
 def align_pair_exclusion_masks(pre_mask: np.ndarray, post_mask: np.ndarray,

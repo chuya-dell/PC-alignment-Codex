@@ -62,11 +62,13 @@ def run(stage, pre, post, initial=None):
         return matrix,{'artifact_mask':{'accepted':True,'mask_fraction':qc['mask_fraction']}}
     if stage=='artifact_subpixel':
         return register_refined(pre,post,stage='subpixel',initial=initial,mask_stains=True)
+    if stage=='spatial_subpixel':
+        return register_refined(pre,post,stage='subpixel',initial=initial,mask_stains=False)
     return register_refined(pre,post,stage=stage,initial=initial)
 
 def main():
     p=argparse.ArgumentParser()
-    p.add_argument('--stage',choices=['baseline','subpixel','lattice','iterative','artifact_mask','artifact_subpixel'],required=True)
+    p.add_argument('--stage',choices=['baseline','subpixel','lattice','iterative','artifact_mask','artifact_subpixel','spatial_subpixel'],required=True)
     p.add_argument('--data-root',type=Path,required=True)
     p.add_argument('--output',type=Path,required=True)
     p.add_argument('--limit',type=int)
@@ -83,7 +85,7 @@ def main():
     rows=[]; ledger=[]
     output=a.output/(a.stage+'.csv')
     previous={'subpixel':'baseline.csv','lattice':'subpixel.csv','iterative':'lattice.csv',
-              'artifact_subpixel':'artifact_mask.csv'}
+              'artifact_subpixel':'artifact_mask.csv','spatial_subpixel':'spatial_gated_coarse.csv'}
     anchor_path=a.output.parent/previous[a.stage] if a.stage in previous else None
     if anchor_path is not None and not anchor_path.is_file():
         anchor_path=anchor_path.parent.parent/previous[a.stage]

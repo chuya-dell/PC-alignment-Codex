@@ -3,12 +3,15 @@ import math
 import unittest
 import warnings
 from unittest.mock import patch
+from types import SimpleNamespace
 
+import cv2
 import numpy as np
 
 from shared.registration import (
     AffineTransformQCError,
     assess_affine_transform_qc,
+    estimate_affine_orb_ransac,
     register_image_pair_affine,
 )
 
@@ -70,6 +73,59 @@ class Phase2TransformQCTest(unittest.TestCase):
         self.assertTrue(qc["accepted"])
         self.assertEqual(qc["mask_fraction"], 1.0)
         self.assertTrue(any("feature starvation" in str(item.message) for item in caught))
+
+    def test_spatial_search_tries_an_alternative_for_row_concentrated_inliers(self):
+        raw = np.zeros(SHAPE, np.float32)
+        points = [cv2.KeyPoint(float(x), 100.0, 1.0) for x in np.linspace(20, 1900, 18)]
+        points += [cv2.KeyPoint(1900.0, 1900.0, 1.0), cv2.KeyPoint(1950.0, 1950.0, 1.0)]
+        descriptors = np.arange(len(points), dtype=np.uint8).reshape(-1, 1)
+
+        class Detector:
+            def detectAndCompute(self, image, mask):
+                return points, descriptors
+
+        class Matcher:
+            def knnMatch(self, desc_a, desc_b, k):
+                return [(SimpleNamespace(queryIdx=i, trainIdx=i, distance=0.0),
+                         SimpleNamespace(distance=100.0)) for i in range(len(points))]
+
+        narrow = np.zeros((len(points), 1), np.uint8); narrow[:18] = 1
+        broad = np.ones((len(points), 1), np.uint8)
+        sparse = np.zeros((len(points), 1), np.uint8); sparse[:8] = 1
+        expected = np.array([[1., 0., 12.], [0., 1., -7.]])
+        with patch("shared.registration.cv2.ORB_create", return_value=Detector()), \
+             patch("shared.registration.cv2.BFMatcher", return_value=Matcher()), \
+             patch("shared.registration.cv2.estimateAffine2D", side_effect=[
+                 (similarity(dx=1), narrow), (expected, broad), (similarity(dx=2), sparse),
+             ]) as fit:
+            result = estimate_affine_orb_ransac(raw, raw, exclude_mask=None)
+
+        np.testing.assert_allclose(result, expected)
+        self.assertEqual(fit.call_count, 3)
+
+    def test_spatial_search_keeps_well_supported_primary_transform(self):
+        raw = np.zeros(SHAPE, np.float32)
+        points = [cv2.KeyPoint(float(x), float(y), 1.0)
+                  for y in np.linspace(20, 1950, 5) for x in np.linspace(20, 1950, 5)]
+        descriptors = np.arange(len(points), dtype=np.uint8).reshape(-1, 1)
+
+        class Detector:
+            def detectAndCompute(self, image, mask):
+                return points, descriptors
+
+        class Matcher:
+            def knnMatch(self, desc_a, desc_b, k):
+                return [(SimpleNamespace(queryIdx=i, trainIdx=i, distance=0.0),
+                         SimpleNamespace(distance=100.0)) for i in range(len(points))]
+
+        expected = similarity(dx=3, dy=-2)
+        with patch("shared.registration.cv2.ORB_create", return_value=Detector()), \
+             patch("shared.registration.cv2.BFMatcher", return_value=Matcher()), \
+             patch("shared.registration.cv2.estimateAffine2D", return_value=(expected, np.ones((len(points), 1), np.uint8))) as fit:
+            result = estimate_affine_orb_ransac(raw, raw, exclude_mask=None)
+
+        np.testing.assert_allclose(result, expected)
+        self.assertEqual(fit.call_count, 1)
 
 
 if __name__ == "__main__":
