@@ -185,8 +185,11 @@ def lattice_refine(pre_raw,post_raw,initial,*,iterations=1):
         'train_loss_after':current_train,'validation_loss_before':before_valid,
         'validation_loss_after':current_valid,'history':history}
 
-def register_refined(pre_raw,post_raw,*,stage='subpixel'):
-    coarse=reg.register_image_pair_affine(pre_raw,post_raw)
+def register_refined(pre_raw,post_raw,*,stage='subpixel',initial=None):
+    coarse=(reg.register_image_pair_affine(pre_raw,post_raw) if initial is None
+            else np.asarray(initial,dtype=np.float32).copy())
+    if coarse.shape!=(2,3) or not reg.assess_affine_transform_qc(coarse,pre_raw.shape)['accepted']:
+        raise ValueError('The supplied initial transform failed physical affine QC.')
     refined,info=subpixel_refine(pre_raw,post_raw,coarse)
     if stage in ('lattice','iterative'):
         lattice,diag=lattice_refine(pre_raw,post_raw,refined,iterations=1 if stage=='lattice' else 10)

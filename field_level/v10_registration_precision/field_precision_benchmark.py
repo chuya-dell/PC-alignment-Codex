@@ -53,11 +53,11 @@ def errors(estimate, truth, shape):
                 grid_rmse_px=np.sqrt(np.mean(np.sum(e*e,axis=1))),
                 grid_max_error_px=np.max(np.linalg.norm(e,axis=1)))
 
-def run(stage, pre, post):
+def run(stage, pre, post, initial=None):
     if stage=='baseline':
         return reg.register_image_pair_affine(pre,post),{}
     from shared.v2_registration_precision.refinement import register_refined
-    return register_refined(pre,post,stage=stage)
+    return register_refined(pre,post,stage=stage,initial=initial)
 
 def main():
     p=argparse.ArgumentParser()
@@ -77,6 +77,8 @@ def main():
     inputs=[item for i,item in enumerate(inputs) if i%a.shards==a.shard_index]
     rows=[]; ledger=[]
     output=a.output/(a.stage+'.csv')
+    anchor_path=a.output.parent/'baseline.csv'
+    anchor_rows=(pd.read_csv(anchor_path).set_index('case_id') if a.stage!='baseline' else None)
     done=pd.read_csv(output).to_dict('records') if output.exists() else []
     completed={r['case_id'] for r in done}; rows.extend(done)
     for folder,pos in inputs:
@@ -98,9 +100,13 @@ def main():
             row=dict(case_id=case,stage=a.stage,source=folder,position=pos,scenario=name)
             start=time.perf_counter()
             try:
-                estimate,diag=run(a.stage,raw,moving)
+                initial=None
+                if anchor_rows is not None:
+                    anchor=anchor_rows.loc[case]
+                    initial=np.array([[anchor[f'm{i}{j}'] for j in range(3)] for i in range(2)],np.float32)
+                estimate,diag=run(a.stage,raw,moving,initial)
                 row.update(status='ok',**errors(estimate,truth,raw.shape),diagnostics=json.dumps(diag))
-                row.update({f'm{i}{j}':estimate[i,j] for i in range(2) for j in range(3)})
+            row.update({f'm{i}{j}':estimate[i,j] for i in range(2) for j in range(3)})
             except Exception as exc:
                 row.update(status='failed',error=f'{type(exc).__name__}: {exc}')
             row['seconds']=time.perf_counter()-start

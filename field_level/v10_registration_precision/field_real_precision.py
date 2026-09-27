@@ -83,13 +83,14 @@ def main():
         cv2.setRNGSeed(20260926)
         return original_process(row,pitch)
     def register(pre,post,return_qc=False,**kwargs):
-        coarse=reg.register_image_pair_affine(pre,post)
-        if a.stage=='baseline': final,info=coarse,{}
+        if a.stage=='baseline':
+            coarse=reg.register_image_pair_affine(pre,post);final,info=coarse,{}
         else:
+            anchor= a.output.parent/'real_baseline'/'diagnostics'/(current['key']+'.json')
+            coarse=(np.asarray(json.loads(anchor.read_text(encoding='utf-8'))['matrix'],dtype=np.float32)
+                    if anchor.exists() else reg.register_image_pair_affine(pre,post))
             from shared.v2_registration_precision.refinement import register_refined
-            # Recompute with the same seed so the coarse baseline is paired exactly.
-            cv2.setRNGSeed(20260926)
-            final,info=register_refined(pre,post,stage=a.stage)
+            final,info=register_refined(pre,post,stage=a.stage,initial=coarse)
         measures=residuals(pre,post,[coarse,final])
         payload=dict(fov_key=current['key'],stage=a.stage,baseline_matrix=coarse.tolist(),matrix=final.tolist(),
                      baseline_residual=measures[0],refined_residual=measures[1],refinement=info)
