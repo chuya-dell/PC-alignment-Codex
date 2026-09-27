@@ -10,6 +10,12 @@ is committed separately. Anti code and its frozen failure investigation are out 
 
 ## Results
 Results go to data/results/v11_registration_precision_20260926, with identical cases per stage.
+The 452-case known-truth baseline has 0.0893 px median and 0.3642 px 95th percentile
+spatial RMSE (maximum 6.8291 px). Subpixel refinement reduced these to 0.0040 and
+0.0159 px, respectively; 420/452 cases improved and none worsened. Large coarse errors
+persist unchanged because the local refinement rejects moves exceeding a quarter pitch.
+The 409-pair real-data baseline rerun gave the same 399 accepted / 10 QC-rejected pairs and
+the same eight dataset-level Mann–Whitney outcomes as the preceding masked reanalysis.
 Inputs are read only from the mounted data root (currently W:/4.生データD_remo).
 
 ## Known limitations

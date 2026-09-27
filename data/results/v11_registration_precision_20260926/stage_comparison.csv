@@ -1,0 +1,2 @@
+stage,previous,n_paired,improved,worse,unchanged,mean_change_px,median_change_px,worst_increase_px
+subpixel,baseline,452,420,0,32,-0.11865198567958359,-0.08266193808784265,0.0
