@@ -16,6 +16,9 @@ spatial RMSE (maximum 6.8291 px). Subpixel refinement reduced these to 0.0040 an
 persist unchanged because the local refinement rejects moves exceeding a quarter pitch.
 The 409-pair real-data baseline rerun gave the same 399 accepted / 10 QC-rejected pairs and
 the same eight dataset-level Mann–Whitney outcomes as the preceding masked reanalysis.
+The fixed-pitch FFT lattice stage improved 180 cases, worsened 204, and left 68 unchanged
+against subpixel refinement. Its median and 95th-percentile spatial errors were higher.
+Do not promote the grid stage solely because its held-out photometric objective decreases.
 Inputs are read only from the mounted data root (currently W:/4.生データD_remo).
 
 ## Known limitations

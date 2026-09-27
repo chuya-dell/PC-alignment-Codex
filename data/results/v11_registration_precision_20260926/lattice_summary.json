@@ -1,0 +1,22 @@
+{
+  "stage": "lattice",
+  "n": 452,
+  "success": 452,
+  "failed": 0,
+  "center_error_px_mean": 0.02682228971749644,
+  "center_error_px_median": 0.0019127048813877001,
+  "center_error_px_p95": 0.022610565296967665,
+  "center_error_px_max": 5.32686184362099,
+  "rotation_edge_error_px_mean": 0.01553058677416065,
+  "rotation_edge_error_px_median": 0.00211088659111315,
+  "rotation_edge_error_px_p95": 0.007688405204005138,
+  "rotation_edge_error_px_max": 2.4193770477832848,
+  "scale_edge_error_px_mean": 0.018833195120794836,
+  "scale_edge_error_px_median": 0.00187977697923545,
+  "scale_edge_error_px_p95": 0.006355331383912089,
+  "scale_edge_error_px_max": 4.274453019715256,
+  "grid_rmse_px_mean": 0.036839962657899794,
+  "grid_rmse_px_median": 0.00516875209065175,
+  "grid_rmse_px_p95": 0.02345749987958274,
+  "grid_rmse_px_max": 6.761370615020015
+}
