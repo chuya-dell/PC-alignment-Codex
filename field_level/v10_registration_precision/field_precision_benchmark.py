@@ -78,6 +78,7 @@ def main():
     rows=[]; ledger=[]
     output=a.output/(a.stage+'.csv')
     anchor_path=a.output.parent/'baseline.csv'
+    if not anchor_path.is_file(): anchor_path=anchor_path.parent.parent/'baseline.csv'
     anchor_rows=(pd.read_csv(anchor_path).set_index('case_id') if a.stage!='baseline' else None)
     done=pd.read_csv(output).to_dict('records') if output.exists() else []
     completed={r['case_id'] for r in done}; rows.extend(done)
