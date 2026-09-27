@@ -436,16 +436,22 @@ def estimate_affine_ecc(pre01: np.ndarray, post01: np.ndarray, exclude_mask: np.
 
 def estimate_affine_orb_ransac(pre01: np.ndarray, post01: np.ndarray, exclude_mask: np.ndarray = None,
                                nfeatures: int = 12000, fast_threshold: int = 3, lowe_ratio: float = .72,
-                               ransac_reproj_threshold: float = 2.5) -> np.ndarray:
-    """ORB keypoints + Lowe-ratio matching + RANSAC affine fit. exclude_mask (True=exclude),
-    if given, is passed to ORB's detectAndCompute so keypoints are never taken from the
-    write-field-boundary band."""
+                               ransac_reproj_threshold: float = 2.5, *,
+                               exclude_mask_post: np.ndarray = None) -> np.ndarray:
+    """Fit pre-to-post coordinates with ORB + RANSAC.
+
+    exclude_mask is in pre-image coordinates. If exclude_mask_post is supplied,
+    it is applied in post-image coordinates; otherwise the pre mask is reused
+    for backward compatibility.
+    """
     a = np.uint8(np.clip(pre01 * 255, 0, 255))
     b = np.uint8(np.clip(post01 * 255, 0, 255))
-    valid_mask = None if exclude_mask is None else (~np.asarray(exclude_mask, bool)).astype(np.uint8) * 255
+    valid_mask_pre = None if exclude_mask is None else (~np.asarray(exclude_mask, bool)).astype(np.uint8) * 255
+    post_mask = exclude_mask if exclude_mask_post is None else exclude_mask_post
+    valid_mask_post = None if post_mask is None else (~np.asarray(post_mask, bool)).astype(np.uint8) * 255
     detector = cv2.ORB_create(nfeatures=nfeatures, fastThreshold=fast_threshold)
-    ka, da = detector.detectAndCompute(a, valid_mask)
-    kb, db = detector.detectAndCompute(b, valid_mask)
+    ka, da = detector.detectAndCompute(a, valid_mask_pre)
+    kb, db = detector.detectAndCompute(b, valid_mask_post)
     if da is None or db is None:
         raise RuntimeError("ORB descriptors unavailable")
     pairs = cv2.BFMatcher(cv2.NORM_HAMMING).knnMatch(da, db, k=2)
@@ -459,6 +465,35 @@ def estimate_affine_orb_ransac(pre01: np.ndarray, post01: np.ndarray, exclude_ma
     if warp is None:
         raise RuntimeError("ORB RANSAC affine fit failed")
     return warp.astype(np.float32)
+
+
+def align_pair_exclusion_masks(pre_mask: np.ndarray, post_mask: np.ndarray,
+                               pre_to_post: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+    """Union native pre/post masks in pre coordinates, then return a mask per image.
+
+    The matrix maps pre coordinates to post coordinates, as returned by the
+    ORB affine estimator. OpenCV's inverse-map flag therefore samples the post
+    mask at the post coordinate corresponding to each output pre pixel.
+    """
+    pre_mask = np.asarray(pre_mask, dtype=bool)
+    post_mask = np.asarray(post_mask, dtype=bool)
+    if pre_mask.ndim != 2 or post_mask.shape != pre_mask.shape:
+        raise ValueError("pre_mask and post_mask must be same-size 2D arrays")
+    matrix = np.asarray(pre_to_post, dtype=np.float32)
+    if matrix.shape != (2, 3) or not np.isfinite(matrix).all():
+        raise ValueError("pre_to_post must be a finite 2x3 affine matrix")
+    height, width = pre_mask.shape
+    post_in_pre = cv2.warpAffine(
+        post_mask.astype(np.uint8), matrix, (width, height),
+        flags=cv2.INTER_NEAREST | cv2.WARP_INVERSE_MAP,
+        borderMode=cv2.BORDER_CONSTANT, borderValue=0)
+    common_pre = pre_mask | (post_in_pre != 0)
+    common_post = cv2.warpAffine(
+        common_pre.astype(np.uint8), matrix, (width, height),
+        flags=cv2.INTER_NEAREST, borderMode=cv2.BORDER_CONSTANT, borderValue=0) != 0
+    # Retain native post detections outside the overlap of the two fields.
+    common_post |= post_mask
+    return common_pre, common_post
 
 
 PHASE2_DEFAULT_METHOD = "orb_ransac_affine"  # docs/MASKED_ALIGNMENT_FINAL_DECISION_20260916.md:
@@ -568,16 +603,17 @@ def register_image_pair_affine(pre_raw: np.ndarray, post_raw: np.ndarray, method
                                mask_stains: bool = False,
                                mask_coverage_warning_fraction: float = .50,
                                **kwargs) -> np.ndarray:
-    """Phase 2 entry point: raw pre/post -> 2x3 affine warp (post -> pre).
+    """Phase 2 entry point returning a 2x3 matrix from pre to post coordinates.
 
     method defaults to PHASE2_DEFAULT_METHOD; pass "orb_ransac_affine" or "ecc_affine_pyramid"
     explicitly to override. exclude_mask defaults to "auto", which runs
     shared.image_qc.bright_band_mask on pre_raw and uses that as the excluded region (the
     write-field-boundary band found at Positions 6/7, docs/POSITION6_IMAGE_FORENSICS_20260916.md);
     pass an explicit boolean array to use a different mask, or None to disable masking.
-    ``mask_stains=True`` opt-in adds the separate conservative dirt/stain mask from both
-    images to the excluded region. It is disabled by default until the paired benchmark
-    demonstrates benefit.
+    ``mask_stains=True`` opt-in first obtains a coarse transform, detects the
+    stain masks independently in each native frame, maps them to common pre
+    coordinates, and refits with corresponding masks in each image's frame.
+    It is disabled by default until the paired benchmark demonstrates benefit.
 
     By default the estimated matrix must pass ``assess_affine_transform_qc``;
     a rejected transform raises ``AffineTransformQCError`` before it can reach
@@ -595,32 +631,59 @@ def register_image_pair_affine(pre_raw: np.ndarray, post_raw: np.ndarray, method
     if auto_mask:
         from shared.image_qc import bright_band_mask
         exclude_mask = bright_band_mask(pre_raw)
-    if mask_stains:
-        from shared.image_qc import stain_artifact_mask
-        stains = stain_artifact_mask(pre_raw) | stain_artifact_mask(post_raw)
-        if exclude_mask is None:
-            exclude_mask = stains
-        else:
-            exclude_mask = np.asarray(exclude_mask, dtype=bool) | stains
-    if exclude_mask is not None:
-        mask = np.asarray(exclude_mask, dtype=bool)
-        if mask.shape != np.asarray(pre_raw).shape:
-            raise ValueError("exclude_mask must have the same shape as pre_raw.")
-        mask_fraction = float(mask.mean())
-        if mask_fraction > mask_coverage_warning_fraction:
-            warnings.warn(
-                f"Registration mask covers {mask_fraction:.1%} of the image; "
-                "ORB feature starvation is possible.", RuntimeWarning, stacklevel=2,
-            )
-    else:
-        mask_fraction = 0.0
     pre01, post01 = image01_for_registration(pre_raw), image01_for_registration(post_raw)
+    base_mask = None if exclude_mask is None else np.asarray(exclude_mask, dtype=bool)
+    if base_mask is not None and base_mask.shape != np.asarray(pre_raw).shape:
+        raise ValueError("exclude_mask must have the same shape as pre_raw.")
+    mask_pre = base_mask
+    mask_post = base_mask
     if method == "orb_ransac_affine":
-        warp = estimate_affine_orb_ransac(pre01, post01, exclude_mask=exclude_mask, **kwargs)
+        if not mask_stains:
+            warp = estimate_affine_orb_ransac(pre01, post01, exclude_mask=base_mask, **kwargs)
+        else:
+            from shared.image_qc import stain_artifact_mask
+            stains_pre = stain_artifact_mask(pre_raw)
+            stains_post = stain_artifact_mask(post_raw)
+            # Start from the existing non-stain exclusion only. Its behavior is
+            # preserved; new stain candidates are handled in their own frames.
+            warp = estimate_affine_orb_ransac(pre01, post01, exclude_mask=base_mask, **kwargs)
+            for _ in range(3):
+                mask_pre, mask_post = align_pair_exclusion_masks(stains_pre, stains_post, warp)
+                if base_mask is not None:
+                    mask_pre |= base_mask
+                    mask_post |= base_mask
+                refined = estimate_affine_orb_ransac(
+                    pre01, post01, exclude_mask=mask_pre,
+                    exclude_mask_post=mask_post, **kwargs)
+                delta = np.max(np.abs(refined - warp))
+                warp = refined
+                if delta < 1e-4:
+                    break
     elif method == "ecc_affine_pyramid":
-        warp = estimate_affine_ecc(pre01, post01, exclude_mask=exclude_mask, **kwargs)
+        if not mask_stains:
+            warp = estimate_affine_ecc(pre01, post01, exclude_mask=base_mask, **kwargs)
+        else:
+            from shared.image_qc import stain_artifact_mask
+            stains_pre = stain_artifact_mask(pre_raw)
+            stains_post = stain_artifact_mask(post_raw)
+            warp = estimate_affine_ecc(pre01, post01, exclude_mask=base_mask, **kwargs)
+            mask_pre, mask_post = align_pair_exclusion_masks(stains_pre, stains_post, warp)
+            if base_mask is not None:
+                mask_pre |= base_mask
+                mask_post |= base_mask
+            # ECC's input mask is expressed in the moving/post frame.
+            warp = estimate_affine_ecc(pre01, post01, exclude_mask=mask_post, **kwargs)
     else:
         raise ValueError(f"Unknown method: {method}")
+    if mask_pre is not None:
+        mask_fraction = float(mask_pre.mean())
+    else:
+        mask_fraction = 0.0
+    if mask_fraction > mask_coverage_warning_fraction:
+        warnings.warn(
+            f"Registration mask covers {mask_fraction:.1%} of the image; "
+            "ORB feature starvation is possible.", RuntimeWarning, stacklevel=2,
+        )
     diagnostics = assess_affine_transform_qc(warp, pre_raw.shape, thresholds=qc_thresholds)
     diagnostics.update(method=method, mask_fraction=mask_fraction)
     if qc and not diagnostics["accepted"]:

@@ -28,6 +28,13 @@
 一次記録未記載をクリーン扱いしていた旧処理の監査は `LEGACY_RECORD_ABSENCE_AUDIT.md` を参照する。
 
 - `environment_check.py`: ピラー単位と視野単位の両方に共通する、依存パッケージ、生画像の読み込み、結果の書き込みを検証する。生データは変更しない。
+# Stain-mask coordinate handling
+
+Registration's opt-in stain path detects pre and post masks in their native frames,
+maps post candidates into common pre coordinates for the union, then maps the union
+back to each image frame for masked feature detection and refitting. The default
+path with stain masking disabled remains unchanged.
+
 # Versioned precision refinement
 
 `v2_registration_precision/` contains opt-in affine refinement shared by pillar sampling

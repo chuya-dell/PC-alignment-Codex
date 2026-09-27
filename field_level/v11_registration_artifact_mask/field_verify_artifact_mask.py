@@ -60,7 +60,7 @@ class StainArtifactMask(unittest.TestCase):
         image, x, ys = image_with_grooves(faint=True, interrupted=True)
         self.assert_grooves_protected(image, x, ys)
 
-    def test_registration_opt_in_unions_stain_mask_without_changing_default(self):
+    def test_registration_opt_in_uses_aligned_stain_mask_without_changing_default(self):
         image, _, _ = image_with_grooves()
         captured = []
 
@@ -72,11 +72,12 @@ class StainArtifactMask(unittest.TestCase):
             reg.register_image_pair_affine(image, image, qc=False)
             reg.register_image_pair_affine(image, image, qc=False, mask_stains=True)
         np.testing.assert_array_equal(captured[0], bright_band_mask(image))
+        np.testing.assert_array_equal(captured[1], bright_band_mask(image))
         expected = bright_band_mask(image) | stain_artifact_mask(image)
-        np.testing.assert_array_equal(captured[1], expected)
-        self.assertFalse(captured[1][:, 240:243].any(), "registration mask covered the vertical mark")
-        self.assertFalse(captured[1][170:176, :].any(), "registration mask covered a horizontal mark")
-        self.assertTrue(captured[1][315:336, 620:641].any(), "opt-in mask missed the dark stain")
+        np.testing.assert_array_equal(captured[2], expected)
+        self.assertFalse(captured[2][:, 240:243].any(), "registration mask covered the vertical mark")
+        self.assertFalse(captured[2][170:176, :].any(), "registration mask covered a horizontal mark")
+        self.assertTrue(captured[2][315:336, 620:641].any(), "opt-in mask missed the dark stain")
 
 
 if __name__ == "__main__":

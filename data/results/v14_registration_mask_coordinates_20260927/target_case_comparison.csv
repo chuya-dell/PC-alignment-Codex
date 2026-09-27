@@ -1,0 +1,7 @@
+stage,rmse_px,status,diagnostics
+baseline,1.006361635541803,ok,{}
+subpixel,0.0303532099704583,ok,"{""subpixel"": {""stage"": ""subpixel"", ""accepted"": true, ""n_features"": 1387, ""n_tracks"": 1343, ""heldout_before_px"": 0.27877482418632255, ""heldout_after_px"": 0.07592608175160764, ""n_inliers"": 991, ""reason"": ""improved""}}"
+old_mask,6.107994225423052,ok,"{""artifact_mask"": {""accepted"": true, ""mask_fraction"": 0.0038505897596624265}}"
+old_mask_subpixel,6.107994225423052,ok,"{""subpixel"": {""stage"": ""subpixel"", ""accepted"": false, ""n_features"": 1392, ""n_tracks"": 690, ""reason"": ""insufficient_spatial_support""}}"
+aligned_mask,1.8264981044693296,ok,"{""artifact_mask"": {""accepted"": true, ""mask_fraction"": 0.0028386722572162426}}"
+aligned_mask_subpixel,1.8264981044693296,ok,"{""subpixel"": {""stage"": ""subpixel"", ""accepted"": false, ""n_features"": 1392, ""n_tracks"": 1171, ""heldout_before_px"": 0.32133089625090383, ""heldout_after_px"": 0.08465171748753557, ""n_inliers"": 893, ""reason"": ""guard_or_no_heldout_improvement""}}"

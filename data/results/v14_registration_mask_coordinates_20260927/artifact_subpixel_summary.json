@@ -1,0 +1,22 @@
+{
+  "stage": "artifact_subpixel",
+  "n": 452,
+  "success": 452,
+  "failed": 0,
+  "center_error_px_mean": 0.03755826809414659,
+  "center_error_px_median": 0.0017653488871224,
+  "center_error_px_p95": 0.008972233290292089,
+  "center_error_px_max": 3.1058576659923403,
+  "rotation_edge_error_px_mean": 0.024649629172262145,
+  "rotation_edge_error_px_median": 0.00194342296705815,
+  "rotation_edge_error_px_p95": 0.015158519936663412,
+  "rotation_edge_error_px_max": 2.7020210153615927,
+  "scale_edge_error_px_mean": 0.018955308241663447,
+  "scale_edge_error_px_median": 0.0023383007963594,
+  "scale_edge_error_px_p95": 0.01722751958642224,
+  "scale_edge_error_px_max": 1.890466237183936,
+  "grid_rmse_px_mean": 0.0497943408769167,
+  "grid_rmse_px_median": 0.00431983193124615,
+  "grid_rmse_px_p95": 0.02117054575200336,
+  "grid_rmse_px_max": 3.894995977133205
+}
