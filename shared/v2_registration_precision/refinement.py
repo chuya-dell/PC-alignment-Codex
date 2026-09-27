@@ -7,8 +7,10 @@ QC gate must pass before local refinement is attempted.
 from __future__ import annotations
 import cv2
 import numpy as np
+from scipy.ndimage import map_coordinates
 from shared import registration as reg
 from shared.image_qc import bright_band_mask
+from shared.lattice_indexing import grid_coordinates,lattice_from_fft
 
 PITCH=7.286
 
@@ -78,10 +80,118 @@ def subpixel_refine(pre_raw,post_raw,coarse):
     info.update(accepted=bool(accept),reason='improved' if accept else 'guard_or_no_heldout_improvement')
     return (candidate.astype(np.float32) if accept else coarse),info
 
+def _sample(image, xy):
+    return map_coordinates(image,[xy[:,1],xy[:,0]],order=1,mode='nearest',prefilter=False)
+
+def _photometric_data(pre,post,matrix,centers,offsets,train):
+    """Patch-centered, contrast-normalized measurements and affine Jacobian."""
+    h,w=pre.shape; radius=np.hypot(w/2,h/2)
+    pre_xy=centers[:,None,:]+offsets[None,:,:]
+    post_xy=transform(pre_xy.reshape(-1,2),matrix).reshape(pre_xy.shape)
+    pre_values=_sample(pre,pre_xy.reshape(-1,2)).reshape(len(centers),-1)
+    post_values=_sample(post,post_xy.reshape(-1,2)).reshape(len(centers),-1)
+    gy,gx=np.gradient(post)
+    dx=_sample(gx,post_xy.reshape(-1,2)).reshape(post_xy.shape[:2])
+    dy=_sample(gy,post_xy.reshape(-1,2)).reshape(post_xy.shape[:2])
+    def normalize(values,derivatives=None):
+        centered=values-values.mean(axis=1,keepdims=True)
+        variance=np.mean(centered**2,axis=1,keepdims=True)
+        denom=np.sqrt(variance+1e-6)
+        norm=centered/denom
+        if derivatives is None:return norm
+        dcenter=derivatives-derivatives.mean(axis=1,keepdims=True)
+        projection=np.sum(centered[:, :, None]*dcenter,axis=1,keepdims=True)
+        jac=dcenter/denom[:,:,None]-centered[:,:,None]*projection/(len(offsets)*denom[:,:,None]**3)
+        return norm,jac
+    pre_norm=normalize(pre_values)
+    post_norm,jxy=normalize(post_values,np.stack([dx,dy],axis=2))
+    xc=post_xy[:,:,0]-((w-1)/2);yc=post_xy[:,:,1]-((h-1)/2)
+    # Parameters are x shift, y shift, rotation at the image edge, scale at the edge.
+    jac=np.empty((len(centers),len(offsets),4),float)
+    jac[:,:,0]=jxy[:,:,0];jac[:,:,1]=jxy[:,:,1]
+    jac[:,:,2]=jxy[:,:,0]*(-yc/radius)+jxy[:,:,1]*(xc/radius)
+    jac[:,:,3]=jxy[:,:,0]*(xc/radius)+jxy[:,:,1]*(yc/radius)
+    return post_norm-pre_norm,jac,post_xy
+
+def lattice_refine(pre_raw,post_raw,initial,*,iterations=1):
+    """Use the fixed-pitch pre-image hex grid as photometric support for a rigid update."""
+    shape=pre_raw.shape
+    pre=reg.image01_for_registration(pre_raw);post=reg.image01_for_registration(post_raw)
+    # Suppress sub-pixel sensor noise equally while retaining the pillar contrast.
+    pre=cv2.GaussianBlur(pre,(0,0),.55);post=cv2.GaussianBlur(post,(0,0),.55)
+    invalid_pre=support_mask(pre_raw,8);invalid_post=support_mask(post_raw,8)
+    clean=pre.copy(); clean[invalid_pre]=cv2.GaussianBlur(pre,(0,0),8)[invalid_pre]
+    try:
+        lattice=lattice_from_fft(clean,PITCH)
+        _,coords=grid_coordinates(lattice,shape[1],shape[0],margin=24)
+    except Exception as exc:
+        return initial,{'stage':'lattice','accepted':False,'reason':f'fft_grid_failed: {exc}'}
+    rng=np.random.default_rng(20260926)
+    if len(coords)>4000: coords=coords[rng.choice(len(coords),4000,replace=False)]
+    offsets=np.vstack([np.zeros((1,2)),np.c_[1.4*np.cos(np.arange(6)*np.pi/3),1.4*np.sin(np.arange(6)*np.pi/3)],
+                              np.c_[2.8*np.cos(np.arange(6)*np.pi/3),2.8*np.sin(np.arange(6)*np.pi/3)]])
+    xy0=coords[:,None,:]+offsets[None,:,:]
+    q0=transform(xy0.reshape(-1,2),initial).reshape(xy0.shape)
+    def is_clear(points,mask):
+        p=np.rint(points).astype(int);h,w=mask.shape
+        ok=(p[:,:,0]>=8)&(p[:,:,0]<w-8)&(p[:,:,1]>=8)&(p[:,:,1]<h-8)
+        indices=np.where(ok)
+        ok[indices] &= ~mask[p[:,:,1][indices],p[:,:,0][indices]]
+        return ok.all(axis=1)
+    usable=is_clear(xy0,invalid_pre)&is_clear(q0,invalid_post)
+    centers=coords[usable]
+    if len(centers)<400:
+        return initial,{'stage':'lattice','accepted':False,'reason':'insufficient_unmasked_grid','n_grid':len(centers)}
+    order=rng.permutation(len(centers));validation=np.zeros(len(centers),bool);validation[order[::5]]=True
+    training=~validation
+    identity=np.arange(len(centers))
+    residual,jac,_=_photometric_data(pre,post,initial,centers,offsets,training)
+    def loss(mat,sel):
+        r,_,_=_photometric_data(pre,post,mat,centers[sel],offsets,training)
+        ar=np.abs(r);return float(np.mean(np.where(ar<=.5,.5*ar*ar,.5*(ar-.25))))
+    before_train=loss(initial,training);before_valid=loss(initial,validation)
+    current=initial.astype(float).copy();current_train=before_train;current_valid=before_valid
+    accepted=0;history=[]
+    for _ in range(max(1,iterations)):
+        residual,jac,_=_photometric_data(pre,post,current,centers,offsets,training)
+        r=residual.reshape(-1);J=jac.reshape(-1,4)
+        weights=np.minimum(1.,.5/np.maximum(np.abs(r),1e-12))
+        delta=np.linalg.lstsq(J*np.sqrt(weights[:,None]),-r*np.sqrt(weights),rcond=None)[0]
+        if not np.isfinite(delta).all(): break
+        stepnorm=float(np.linalg.norm(delta));
+        if stepnorm>.45: delta*=.45/stepnorm
+        old=current.copy(); best=None
+        for factor in (1.,.5,.25,.125,.0625):
+            dx,dy,edge_theta,edge_scale=delta*factor
+            h,w=shape;radius=np.hypot(w/2,h/2);c=np.array([(w-1)/2,(h-1)/2])
+            angle=edge_theta/radius;s=1+edge_scale/radius
+            rot=s*np.array([[np.cos(angle),-np.sin(angle)],[np.sin(angle),np.cos(angle)]])
+            correction=np.c_[rot,c+np.array([dx,dy])-rot@c]
+            candidate=(np.vstack([correction,[0,0,1]])@np.vstack([current,[0,0,1]]))[:2]
+            if not permissible(candidate,initial,shape):continue
+            train_loss=loss(candidate,training);valid_loss=loss(candidate,validation)
+            if train_loss<current_train-1e-10 and valid_loss<=current_valid+1e-8:
+                best=(candidate,train_loss,valid_loss,float(factor));break
+        if best is None:break
+        current,current_train,current_valid,factor=best;accepted+=1
+        history.append({'step_px':stepnorm*factor,'train_loss':current_train,'validation_loss':current_valid})
+        if stepnorm*factor<1e-4:break
+    change=float(np.max(np.linalg.norm(transform(probes(shape),current)-transform(probes(shape),initial),axis=1)))
+    did_accept=accepted>0
+    return (current.astype(np.float32) if did_accept else initial),{
+        'stage':'lattice','accepted':did_accept,'reason':'validation_improved' if did_accept else 'no_validated_step',
+        'n_grid':len(centers),'n_training':int(training.sum()),'n_validation':int(validation.sum()),
+        'iterations':accepted,'max_change_px':change,'train_loss_before':before_train,
+        'train_loss_after':current_train,'validation_loss_before':before_valid,
+        'validation_loss_after':current_valid,'history':history}
+
 def register_refined(pre_raw,post_raw,*,stage='subpixel'):
-    if stage!='subpixel': raise ValueError(f'Unavailable stage: {stage}')
     coarse=reg.register_image_pair_affine(pre_raw,post_raw)
     refined,info=subpixel_refine(pre_raw,post_raw,coarse)
+    if stage in ('lattice','iterative'):
+        lattice,diag=lattice_refine(pre_raw,post_raw,refined,iterations=1 if stage=='lattice' else 10)
+        refined=lattice;info['lattice']=diag
+    elif stage!='subpixel': raise ValueError(f'Unavailable stage: {stage}')
     qc=reg.assess_affine_transform_qc(refined,pre_raw.shape)
     if not qc['accepted']: raise reg.AffineTransformQCError(qc)
     return refined,{'subpixel':info}
