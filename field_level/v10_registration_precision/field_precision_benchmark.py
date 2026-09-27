@@ -106,7 +106,7 @@ def main():
                     initial=np.array([[anchor[f'm{i}{j}'] for j in range(3)] for i in range(2)],np.float32)
                 estimate,diag=run(a.stage,raw,moving,initial)
                 row.update(status='ok',**errors(estimate,truth,raw.shape),diagnostics=json.dumps(diag))
-            row.update({f'm{i}{j}':estimate[i,j] for i in range(2) for j in range(3)})
+                row.update({f'm{i}{j}':estimate[i,j] for i in range(2) for j in range(3)})
             except Exception as exc:
                 row.update(status='failed',error=f'{type(exc).__name__}: {exc}')
             row['seconds']=time.perf_counter()-start
