@@ -11,6 +11,12 @@ The coarse and final transforms must pass the existing physical QC gate.
 ## Results
 Staged results are stored under data/results/v11_registration_precision_20260926.
 
+## Iterative lattice stage
+The iterative entry point starts from the saved one-step lattice result. It repeats an
+individually validated Gauss–Newton update until the maximum image-field motion is below
+1e-4 px, no validation-safe step remains, or ten steps have run. Cumulative motion stays
+below one quarter of the 7.286 px pitch.
+
 ## Known issues
 Local tracking cannot repair a wrong coarse lattice cell. Coarse failures remain failures.
 The existing groove detector already has parabolic subpixel interpolation; it is not the

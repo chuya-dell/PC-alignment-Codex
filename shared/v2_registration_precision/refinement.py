@@ -187,20 +187,29 @@ def lattice_refine(pre_raw,post_raw,initial,*,iterations=1):
 
 def iterative_lattice_refine(pre_raw,post_raw,initial,*,max_iterations=10,tolerance_px=1e-4):
     """Repeat one validated lattice update from its saved predecessor to convergence."""
-    current=np.asarray(initial,dtype=np.float32).copy();history=[]
+    current=np.asarray(initial,dtype=np.float32).copy();anchor=current.copy();history=[];reason='no_validated_step'
     for iteration in range(max_iterations):
         updated,info=lattice_refine(pre_raw,post_raw,current,iterations=1)
-        if not info.get('accepted'):break
+        if not info.get('accepted'):
+            reason='no_validated_step';break
         delta=float(np.max(np.linalg.norm(transform(probes(pre_raw.shape),updated)-
                                            transform(probes(pre_raw.shape),current),axis=1)))
+        total=float(np.max(np.linalg.norm(transform(probes(pre_raw.shape),updated)-
+                                           transform(probes(pre_raw.shape),anchor),axis=1)))
+        if total>=PITCH/4:
+            reason='cumulative_cell_guard';break
         history.append({'iteration':iteration+1,'change_px':delta,
                         'validation_loss':info['validation_loss_after']})
         current=updated
-        if delta<tolerance_px:break
+        if delta<tolerance_px:
+            reason='converged';break
+    else:
+        reason='max_iterations'
     return current,{'stage':'iterative','accepted':bool(history),
-                    'reason':'converged' if history and history[-1]['change_px']<tolerance_px else
-                             ('max_iterations' if len(history)==max_iterations else 'no_validated_step'),
+                    'reason':reason,
                     'iterations':len(history),'max_change_px':max((x['change_px'] for x in history),default=0.),
+                    'total_change_px':float(np.max(np.linalg.norm(transform(probes(pre_raw.shape),current)-
+                                                                  transform(probes(pre_raw.shape),anchor),axis=1))),
                     'history':history}
 
 def register_refined(pre_raw,post_raw,*,stage='subpixel',initial=None):
