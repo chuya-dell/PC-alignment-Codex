@@ -19,6 +19,9 @@ the same eight dataset-level Mann–Whitney outcomes as the preceding masked rea
 The fixed-pitch FFT lattice stage improved 180 cases, worsened 204, and left 68 unchanged
 against subpixel refinement. Its median and 95th-percentile spatial errors were higher.
 Do not promote the grid stage solely because its held-out photometric objective decreases.
+The iterative stage then improved 87/452, worsened 11/452, and left 354 unchanged relative
+to the one-step lattice result. Its median RMSE was 0.00503 px and 95th percentile 0.02340 px;
+both are slightly below the lattice stage but remain above the subpixel stage.
 Inputs are read only from the mounted data root (currently W:/4.生データD_remo).
 
 ## Known limitations
