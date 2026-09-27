@@ -86,7 +86,9 @@ def main():
         if a.stage=='baseline':
             coarse=reg.register_image_pair_affine(pre,post);final,info=coarse,{}
         else:
-            anchor= a.output.parent/'real_baseline'/'diagnostics'/(current['key']+'.json')
+            prior={'subpixel':'real_baseline','lattice':'real_cascade_subpixel',
+                   'iterative':'real_cascade_lattice'}[a.stage]
+            anchor= a.output.parent/prior/'diagnostics'/(current['key']+'.json')
             coarse=(np.asarray(json.loads(anchor.read_text(encoding='utf-8'))['matrix'],dtype=np.float32)
                     if anchor.exists() else reg.register_image_pair_affine(pre,post))
             from shared.v2_registration_precision.refinement import register_refined

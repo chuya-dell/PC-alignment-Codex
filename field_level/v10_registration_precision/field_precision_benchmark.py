@@ -77,8 +77,12 @@ def main():
     inputs=[item for i,item in enumerate(inputs) if i%a.shards==a.shard_index]
     rows=[]; ledger=[]
     output=a.output/(a.stage+'.csv')
-    anchor_path=a.output.parent/'baseline.csv'
-    if not anchor_path.is_file(): anchor_path=anchor_path.parent.parent/'baseline.csv'
+    previous={'subpixel':'baseline.csv','lattice':'subpixel.csv','iterative':'lattice.csv'}
+    anchor_path=a.output.parent/previous[a.stage] if a.stage in previous else None
+    if anchor_path is not None and not anchor_path.is_file():
+        anchor_path=anchor_path.parent.parent/previous[a.stage]
+    if a.stage!='baseline' and not anchor_path.is_file():
+        raise FileNotFoundError(f'Missing preceding-stage output: {anchor_path}')
     anchor_rows=(pd.read_csv(anchor_path).set_index('case_id') if a.stage!='baseline' else None)
     done=pd.read_csv(output).to_dict('records') if output.exists() else []
     completed={r['case_id'] for r in done}; rows.extend(done)

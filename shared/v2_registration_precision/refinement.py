@@ -185,16 +185,35 @@ def lattice_refine(pre_raw,post_raw,initial,*,iterations=1):
         'train_loss_after':current_train,'validation_loss_before':before_valid,
         'validation_loss_after':current_valid,'history':history}
 
+def iterative_lattice_refine(pre_raw,post_raw,initial,*,max_iterations=10,tolerance_px=1e-4):
+    """Repeat one validated lattice update from its saved predecessor to convergence."""
+    current=np.asarray(initial,dtype=np.float32).copy();history=[]
+    for iteration in range(max_iterations):
+        updated,info=lattice_refine(pre_raw,post_raw,current,iterations=1)
+        if not info.get('accepted'):break
+        delta=float(np.max(np.linalg.norm(transform(probes(pre_raw.shape),updated)-
+                                           transform(probes(pre_raw.shape),current),axis=1)))
+        history.append({'iteration':iteration+1,'change_px':delta,
+                        'validation_loss':info['validation_loss_after']})
+        current=updated
+        if delta<tolerance_px:break
+    return current,{'stage':'iterative','accepted':bool(history),
+                    'reason':'converged' if history and history[-1]['change_px']<tolerance_px else
+                             ('max_iterations' if len(history)==max_iterations else 'no_validated_step'),
+                    'iterations':len(history),'max_change_px':max((x['change_px'] for x in history),default=0.),
+                    'history':history}
+
 def register_refined(pre_raw,post_raw,*,stage='subpixel',initial=None):
     coarse=(reg.register_image_pair_affine(pre_raw,post_raw) if initial is None
             else np.asarray(initial,dtype=np.float32).copy())
     if coarse.shape!=(2,3) or not reg.assess_affine_transform_qc(coarse,pre_raw.shape)['accepted']:
         raise ValueError('The supplied initial transform failed physical affine QC.')
-    refined,info=subpixel_refine(pre_raw,post_raw,coarse)
-    if stage in ('lattice','iterative'):
-        lattice,diag=lattice_refine(pre_raw,post_raw,refined,iterations=1 if stage=='lattice' else 10)
-        refined=lattice;info['lattice']=diag
-    elif stage!='subpixel': raise ValueError(f'Unavailable stage: {stage}')
+    if stage=='subpixel': refined,info=subpixel_refine(pre_raw,post_raw,coarse); diagnostics={'subpixel':info}
+    elif stage=='lattice':
+        refined,info=lattice_refine(pre_raw,post_raw,coarse,iterations=1);diagnostics={'lattice':info}
+    elif stage=='iterative':
+        refined,info=iterative_lattice_refine(pre_raw,post_raw,coarse,max_iterations=10);diagnostics={'iterative':info}
+    else: raise ValueError(f'Unavailable stage: {stage}')
     qc=reg.assess_affine_transform_qc(refined,pre_raw.shape)
     if not qc['accepted']: raise reg.AffineTransformQCError(qc)
-    return refined,{'subpixel':info}
+    return refined,diagnostics
