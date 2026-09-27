@@ -1,0 +1,22 @@
+{
+  "stage": "artifact_mask",
+  "n": 452,
+  "success": 452,
+  "failed": 0,
+  "center_error_px_mean": 0.10217778498043882,
+  "center_error_px_median": 0.050275492753806,
+  "center_error_px_p95": 0.2760418740782971,
+  "center_error_px_max": 4.87900782860793,
+  "rotation_edge_error_px_mean": 0.07705017996997562,
+  "rotation_edge_error_px_median": 0.03624949608472305,
+  "rotation_edge_error_px_p95": 0.2601180397030693,
+  "rotation_edge_error_px_max": 4.365136472720945,
+  "scale_edge_error_px_mean": 0.07391803219088966,
+  "scale_edge_error_px_median": 0.037702695839125555,
+  "scale_edge_error_px_p95": 0.23160949224618585,
+  "scale_edge_error_px_max": 2.1289732670453496,
+  "grid_rmse_px_mean": 0.15423338296838676,
+  "grid_rmse_px_median": 0.0853990940215035,
+  "grid_rmse_px_p95": 0.37586470356484475,
+  "grid_rmse_px_max": 6.107994225423052
+}
