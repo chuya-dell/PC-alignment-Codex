@@ -13,6 +13,9 @@
   輝度統計から同じ問題を自動フラグする`saturation_qc`。詳細は
   `docs/POSITION6_IMAGE_FORENSICS_20260916.md`と`docs/MASKED_ALIGNMENT_FINAL_DECISION_20260916.md`
   を参照。`registration.py`の`register_image_pair_affine`から自動的に呼ばれる。
+  ゴミ・シミ候補の`stain_artifact_mask`は別マスクで、十字傷の保護テストを含む。精度の
+  効果が一様でないため現時点では`register_image_pair_affine(..., mask_stains=True)`でのみ
+  有効になるオプトイン機能で、既定経路は変えない。
 - `registration.py`: Phase 2の`register_image_pair_affine`は、推定アフィンを下流へ渡す前に
   `assess_affine_transform_qc`で物理的妥当性を検査する。これはピラー・視野のどちらにも
   共通する登録安全境界なので`shared/`に置く。既定では中心変位125 px、回転3度、

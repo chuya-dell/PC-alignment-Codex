@@ -565,6 +565,7 @@ def register_image_pair_affine(pre_raw: np.ndarray, post_raw: np.ndarray, method
                                exclude_mask="auto", *, qc: bool = True,
                                qc_thresholds: AffineQCThresholds = None,
                                return_qc: bool = False,
+                               mask_stains: bool = False,
                                mask_coverage_warning_fraction: float = .50,
                                **kwargs) -> np.ndarray:
     """Phase 2 entry point: raw pre/post -> 2x3 affine warp (post -> pre).
@@ -574,6 +575,9 @@ def register_image_pair_affine(pre_raw: np.ndarray, post_raw: np.ndarray, method
     shared.image_qc.bright_band_mask on pre_raw and uses that as the excluded region (the
     write-field-boundary band found at Positions 6/7, docs/POSITION6_IMAGE_FORENSICS_20260916.md);
     pass an explicit boolean array to use a different mask, or None to disable masking.
+    ``mask_stains=True`` opt-in adds the separate conservative dirt/stain mask from both
+    images to the excluded region. It is disabled by default until the paired benchmark
+    demonstrates benefit.
 
     By default the estimated matrix must pass ``assess_affine_transform_qc``;
     a rejected transform raises ``AffineTransformQCError`` before it can reach
@@ -587,9 +591,17 @@ def register_image_pair_affine(pre_raw: np.ndarray, post_raw: np.ndarray, method
     but makes ORB feature starvation explicit in batch logs.
     """
     method = method or PHASE2_DEFAULT_METHOD
-    if isinstance(exclude_mask, str) and exclude_mask == "auto":
+    auto_mask = isinstance(exclude_mask, str) and exclude_mask == "auto"
+    if auto_mask:
         from shared.image_qc import bright_band_mask
         exclude_mask = bright_band_mask(pre_raw)
+    if mask_stains:
+        from shared.image_qc import stain_artifact_mask
+        stains = stain_artifact_mask(pre_raw) | stain_artifact_mask(post_raw)
+        if exclude_mask is None:
+            exclude_mask = stains
+        else:
+            exclude_mask = np.asarray(exclude_mask, dtype=bool) | stains
     if exclude_mask is not None:
         mask = np.asarray(exclude_mask, dtype=bool)
         if mask.shape != np.asarray(pre_raw).shape:

@@ -24,8 +24,12 @@ def valid_points(points, mask, margin=12):
     valid[index] &= ~mask[xy[index,1],xy[index,0]]
     return valid
 
-def support_mask(raw, radius=12):
-    return cv2.dilate(bright_band_mask(raw).astype(np.uint8),
+def support_mask(raw, radius=12, *, mask_stains=False):
+    excluded = bright_band_mask(raw)
+    if mask_stains:
+        from shared.image_qc import stain_artifact_mask
+        excluded |= stain_artifact_mask(raw)
+    return cv2.dilate(excluded.astype(np.uint8),
                       np.ones((2*radius+1,2*radius+1),np.uint8)).astype(bool)
 
 def probes(shape):
@@ -37,10 +41,10 @@ def permissible(candidate, anchor, shape):
     return (reg.assess_affine_transform_qc(candidate,shape)['accepted'] and
             np.max(np.linalg.norm(transform(probes(shape),candidate)-transform(probes(shape),anchor),axis=1))<PITCH/4)
 
-def subpixel_refine(pre_raw,post_raw,coarse):
+def subpixel_refine(pre_raw,post_raw,coarse,*,mask_stains=False):
     pre=reg.image01_for_registration(pre_raw); post=reg.image01_for_registration(post_raw)
     a=np.uint8(np.clip(pre*255,0,255)); b=np.uint8(np.clip(post*255,0,255))
-    ma=support_mask(pre_raw); mb=support_mask(post_raw)
+    ma=support_mask(pre_raw,mask_stains=mask_stains); mb=support_mask(post_raw,mask_stains=mask_stains)
     points=cv2.goodFeaturesToTrack(a,maxCorners=2500,qualityLevel=.015,minDistance=12,
                                   mask=(~ma).astype(np.uint8)*255,blockSize=5)
     info={'stage':'subpixel','accepted':False}
@@ -212,12 +216,13 @@ def iterative_lattice_refine(pre_raw,post_raw,initial,*,max_iterations=10,tolera
                                                                   transform(probes(pre_raw.shape),anchor),axis=1))),
                     'history':history}
 
-def register_refined(pre_raw,post_raw,*,stage='subpixel',initial=None):
+def register_refined(pre_raw,post_raw,*,stage='subpixel',initial=None,mask_stains=False):
     coarse=(reg.register_image_pair_affine(pre_raw,post_raw) if initial is None
             else np.asarray(initial,dtype=np.float32).copy())
     if coarse.shape!=(2,3) or not reg.assess_affine_transform_qc(coarse,pre_raw.shape)['accepted']:
         raise ValueError('The supplied initial transform failed physical affine QC.')
-    if stage=='subpixel': refined,info=subpixel_refine(pre_raw,post_raw,coarse); diagnostics={'subpixel':info}
+    if stage=='subpixel':
+        refined,info=subpixel_refine(pre_raw,post_raw,coarse,mask_stains=mask_stains);diagnostics={'subpixel':info}
     elif stage=='lattice':
         refined,info=lattice_refine(pre_raw,post_raw,coarse,iterations=1);diagnostics={'lattice':info}
     elif stage=='iterative':

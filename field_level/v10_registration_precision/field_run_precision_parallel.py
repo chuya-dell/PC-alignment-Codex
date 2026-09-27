@@ -16,7 +16,8 @@ def main():
     p.add_argument('--workers',type=int,default=4)
     a=p.parse_args(); a.output.mkdir(parents=True,exist_ok=True)
     existing=a.output/(a.stage+'.csv')
-    prerequisite={'subpixel':'baseline.csv','lattice':'subpixel.csv','iterative':'lattice.csv'}
+    prerequisite={'subpixel':'baseline.csv','lattice':'subpixel.csv','iterative':'lattice.csv',
+                  'artifact_subpixel':'artifact_mask.csv'}
     if a.stage in prerequisite and not (a.output/prerequisite[a.stage]).is_file():
         raise FileNotFoundError(f'Run the preceding stage first: {a.output/prerequisite[a.stage]}')
     prior=pd.read_csv(existing) if existing.exists() else pd.DataFrame()

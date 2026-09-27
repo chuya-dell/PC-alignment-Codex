@@ -5,7 +5,10 @@ Production affine initialization is unchanged. Refine detected corners on float 
 track local displacements with bidirectional Lucas–Kanade correspondence, and robustly refit
 the full affine on training correspondences. A held-out median correspondence error must
 improve. Require spatial support and cap the change everywhere at one quarter pitch.
-Both native-coordinate bright-band masks are dilated to protect patch footprints.
+Both native-coordinate bright-band masks are dilated to protect patch footprints. An
+additional dirt/stain exclusion can be opted into through `mask_stains=True`; this adds
+the stain mask from both images without changing the default path. The stain-mask benchmark
+is experimental because it improves some known-truth cases and worsens others.
 The coarse and final transforms must pass the existing physical QC gate.
 
 ## Results

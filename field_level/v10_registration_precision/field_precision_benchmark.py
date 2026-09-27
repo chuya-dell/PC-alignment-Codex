@@ -57,11 +57,16 @@ def run(stage, pre, post, initial=None):
     if stage=='baseline':
         return reg.register_image_pair_affine(pre,post),{}
     from shared.v2_registration_precision.refinement import register_refined
+    if stage=='artifact_mask':
+        matrix,qc=reg.register_image_pair_affine(pre,post,mask_stains=True,return_qc=True)
+        return matrix,{'artifact_mask':{'accepted':True,'mask_fraction':qc['mask_fraction']}}
+    if stage=='artifact_subpixel':
+        return register_refined(pre,post,stage='subpixel',initial=initial,mask_stains=True)
     return register_refined(pre,post,stage=stage,initial=initial)
 
 def main():
     p=argparse.ArgumentParser()
-    p.add_argument('--stage',choices=['baseline','subpixel','lattice','iterative'],required=True)
+    p.add_argument('--stage',choices=['baseline','subpixel','lattice','iterative','artifact_mask','artifact_subpixel'],required=True)
     p.add_argument('--data-root',type=Path,required=True)
     p.add_argument('--output',type=Path,required=True)
     p.add_argument('--limit',type=int)
@@ -77,13 +82,14 @@ def main():
     inputs=[item for i,item in enumerate(inputs) if i%a.shards==a.shard_index]
     rows=[]; ledger=[]
     output=a.output/(a.stage+'.csv')
-    previous={'subpixel':'baseline.csv','lattice':'subpixel.csv','iterative':'lattice.csv'}
+    previous={'subpixel':'baseline.csv','lattice':'subpixel.csv','iterative':'lattice.csv',
+              'artifact_subpixel':'artifact_mask.csv'}
     anchor_path=a.output.parent/previous[a.stage] if a.stage in previous else None
     if anchor_path is not None and not anchor_path.is_file():
         anchor_path=anchor_path.parent.parent/previous[a.stage]
-    if a.stage!='baseline' and not anchor_path.is_file():
+    if anchor_path is not None and not anchor_path.is_file():
         raise FileNotFoundError(f'Missing preceding-stage output: {anchor_path}')
-    anchor_rows=(pd.read_csv(anchor_path).set_index('case_id') if a.stage!='baseline' else None)
+    anchor_rows=(pd.read_csv(anchor_path).set_index('case_id') if anchor_path is not None else None)
     done=pd.read_csv(output).to_dict('records') if output.exists() else []
     completed={r['case_id'] for r in done}; rows.extend(done)
     for folder,pos in inputs:
