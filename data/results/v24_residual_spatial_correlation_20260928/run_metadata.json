@@ -1,0 +1,27 @@
+{
+  "version": "v24",
+  "real_fovs": 401,
+  "semisynthetic_conditions": 452,
+  "sensitivity_conditions": 243,
+  "independent_detector": "v17 detect_centers and residual_record unchanged",
+  "confidence_quantile": 0.5,
+  "one_to_one_nearest_neighbor": true,
+  "half_pitch_cutoff_px": 3.643,
+  "pitch_px": 7.286,
+  "robust_winsor_rule": "center residual vectors by component-wise median; cap centered-vector norm at median norm plus three scaled median absolute deviations",
+  "pair_sampling": "uniform random anchors, maximum 768 per FOV, deterministic CRC32 seed, lattice distance shells through about 10.0 pitches",
+  "variogram_model": "exponential; sill fixed to robust empirical total variance to avoid unconstrained extrapolation",
+  "sensitivity_amplitudes_px": [
+    0.3,
+    0.6,
+    1.0
+  ],
+  "sensitivity_wavelength_fraction_of_width": [
+    0.125,
+    0.25,
+    0.5
+  ],
+  "sensitivity_direction": "horizontal sinusoidal displacement",
+  "semi_p95_structured_rms_px": 0.1312428658636315,
+  "semi_p95_nearest_neighbor_correlation": 0.1008842787481907
+}
