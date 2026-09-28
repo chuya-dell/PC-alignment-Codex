@@ -1,0 +1,63 @@
+{
+  "n_conditions": 452,
+  "n_source_images": 27,
+  "n_converged": 450,
+  "n_max_remap_reached": 2,
+  "median_pairs": 30945.5,
+  "median_changed_pair_count": 22.0,
+  "median_changed_pair_fraction_estimate": 0.00022354492567135906,
+  "p95_changed_pair_fraction_estimate": 0.0007087724607393426,
+  "refit_better_known_truth_count": 114,
+  "same_within_1e_6_count": 27,
+  "refit_worse_known_truth_count": 338,
+  "refit_better_heldout_count": 221,
+  "median_known_truth_rmse_change_px": 0.0040458281782461,
+  "median_heldout_residual_change_px": 1.867443197638367e-12,
+  "v15_standard_reported_median_grid_rmse_px": 0.00397032599253385,
+  "measurements": [
+    {
+      "metric": "current_known_transform_error",
+      "n": 452,
+      "median_px": 0.00391693154900115,
+      "p95_px": 0.01430420894818834,
+      "max_px": 0.062796843580801,
+      "mean_px": 0.005596450428906682
+    },
+    {
+      "metric": "refit_known_transform_error",
+      "n": 452,
+      "median_px": 0.0084277398123486,
+      "p95_px": 0.03350405380991934,
+      "max_px": 0.0504600968485609,
+      "mean_px": 0.0115928351285781
+    },
+    {
+      "metric": "current_heldout_residual",
+      "n": 452,
+      "median_px": 0.43738996665520635,
+      "p95_px": 0.6744099538858547,
+      "max_px": 0.7285106748452219,
+      "mean_px": 0.4188228623495304
+    },
+    {
+      "metric": "refit_heldout_residual",
+      "n": 452,
+      "median_px": 0.4371466537490273,
+      "p95_px": 0.6743655777174417,
+      "max_px": 0.7285422859284927,
+      "mean_px": 0.41868717091382257
+    }
+  ],
+  "changed_pair_fraction_note": "Estimate: cumulative changed pair count divided by pair count times (remapping iterations - 1); matching count can vary slightly between iterations.",
+  "known_transform_improved_gt_1e_6_count": 114,
+  "known_transform_equivalent_within_1e_6_count": 27,
+  "known_transform_worsened_gt_1e_6_count": 311,
+  "heldout_residual_improved_gt_1e_6_count": 220,
+  "heldout_residual_equivalent_within_1e_6_count": 30,
+  "heldout_residual_worsened_gt_1e_6_count": 202,
+  "nonconverged_case_ids": [
+    "260828-p50-SAM_1-6_axis_00",
+    "260827_pp50_dna_1-6_axis_00"
+  ],
+  "truth_error_difference_tolerance_px": 1e-06
+}
