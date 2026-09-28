@@ -1,0 +1,33 @@
+{
+  "version": 21,
+  "fov_count": 401,
+  "high_ambiguity_threshold": 0.25,
+  "high_ambiguity_count": 47,
+  "low_quartile_cutoff": 0.1230396678966789,
+  "control_sample_count": 47,
+  "control_sampling_seed": 20260928,
+  "top10_order": [
+    "260828_p50_dna_10_1",
+    "260829_p50_sam_3_6",
+    "260824_p50_SHC6OH_12_7",
+    "260829_p50_sam_8_6",
+    "260828_p50_dna_1_6",
+    "260829_p50_sam_3_8",
+    "260826_p50_sam_2_6",
+    "260824_p50_SHC6OH_2_8",
+    "260828_p50_dna_10_8",
+    "260824_p50_SHC6OH_12_3"
+  ],
+  "focus_fields": [
+    "260825_p50_dna_1_7",
+    "260829_p50_sam_3_4",
+    "260829_p50_sam_7_8",
+    "260826_p50_sam_11_7"
+  ],
+  "lattice_pitch_px": 7.286,
+  "ambiguous_threshold_px": 3.643,
+  "v17_per_image_fft_grid_confidence_value_stored": false,
+  "residual_vector_records": 498482,
+  "spatial_map_grid": "20x20 normalized field bins; rate among detected center correspondences within each occupied bin.",
+  "interpretation": "Diagnostic only; registration algorithm, defaults, and option behavior were not changed."
+}
