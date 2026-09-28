@@ -1,0 +1,108 @@
+{
+  "stage": "v16_real_spatial_subpixel_20260928",
+  "pairs": 409,
+  "status_counts": {
+    "ok": 401,
+    "registration_qc_rejected": 8
+  },
+  "same_fov_keys_and_statuses_as_baseline": false,
+  "all_two_sided_and_directional_p_values_unchanged": false,
+  "datasets": [
+    {
+      "dataset": "260824_p50_SHC6OH",
+      "n_high_baseline": 8,
+      "n_blank_baseline": 6,
+      "p_two_sided_exact_baseline": 0.662004662004662,
+      "p_one_sided_greater_exact_baseline": 0.331002331002331,
+      "n_high_stage": 8,
+      "n_blank_stage": 6,
+      "p_two_sided_exact_stage": 0.9497169497169498,
+      "p_one_sided_greater_exact_stage": 0.5740925740925741,
+      "p_values_unchanged": false
+    },
+    {
+      "dataset": "260825_p50_dna",
+      "n_high_baseline": 7,
+      "n_blank_baseline": 7,
+      "p_two_sided_exact_baseline": 0.1282051282051282,
+      "p_one_sided_greater_exact_baseline": 0.9513403263403264,
+      "n_high_stage": 7,
+      "n_blank_stage": 7,
+      "p_two_sided_exact_stage": 0.6200466200466201,
+      "p_one_sided_greater_exact_stage": 0.3100233100233101,
+      "p_values_unchanged": false
+    },
+    {
+      "dataset": "260826_p50_sam",
+      "n_high_baseline": 7,
+      "n_blank_baseline": 1,
+      "p_two_sided_exact_baseline": 1.0,
+      "p_one_sided_greater_exact_baseline": 0.625,
+      "n_high_stage": 7,
+      "n_blank_stage": 1,
+      "p_two_sided_exact_stage": 1.0,
+      "p_one_sided_greater_exact_stage": 0.625,
+      "p_values_unchanged": true
+    },
+    {
+      "dataset": "260827_p50_dna",
+      "n_high_baseline": 8,
+      "n_blank_baseline": 7,
+      "p_two_sided_exact_baseline": 0.5358197358197359,
+      "p_one_sided_greater_exact_baseline": 0.2679098679098679,
+      "n_high_stage": 8,
+      "n_blank_stage": 7,
+      "p_two_sided_exact_stage": 0.3356643356643357,
+      "p_one_sided_greater_exact_stage": 0.1678321678321678,
+      "p_values_unchanged": false
+    },
+    {
+      "dataset": "260828_p50_dna",
+      "n_high_baseline": 8,
+      "n_blank_baseline": 7,
+      "p_two_sided_exact_baseline": 0.3968919968919969,
+      "p_one_sided_greater_exact_baseline": 0.8321678321678321,
+      "n_high_stage": 8,
+      "n_blank_stage": 7,
+      "p_two_sided_exact_stage": 0.6125874125874127,
+      "p_one_sided_greater_exact_stage": 0.7320901320901321,
+      "p_values_unchanged": false
+    },
+    {
+      "dataset": "260828_p50_sam",
+      "n_high_baseline": 5,
+      "n_blank_baseline": 8,
+      "p_two_sided_exact_baseline": 0.7241647241647241,
+      "p_one_sided_greater_exact_baseline": 0.362082362082362,
+      "n_high_stage": 5,
+      "n_blank_stage": 8,
+      "p_two_sided_exact_stage": 0.7241647241647241,
+      "p_one_sided_greater_exact_stage": 0.362082362082362,
+      "p_values_unchanged": true
+    },
+    {
+      "dataset": "260829_p50_dna",
+      "n_high_baseline": 0,
+      "n_blank_baseline": 5,
+      "p_two_sided_exact_baseline": null,
+      "p_one_sided_greater_exact_baseline": null,
+      "n_high_stage": 0,
+      "n_blank_stage": 5,
+      "p_two_sided_exact_stage": null,
+      "p_one_sided_greater_exact_stage": null,
+      "p_values_unchanged": true
+    },
+    {
+      "dataset": "260829_p50_sam",
+      "n_high_baseline": 8,
+      "n_blank_baseline": 7,
+      "p_two_sided_exact_baseline": 0.5358197358197359,
+      "p_one_sided_greater_exact_baseline": 0.2679098679098679,
+      "n_high_stage": 8,
+      "n_blank_stage": 7,
+      "p_two_sided_exact_stage": 0.8665112665112666,
+      "p_one_sided_greater_exact_stage": 0.4332556332556333,
+      "p_values_unchanged": false
+    }
+  ]
+}

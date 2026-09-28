@@ -1,0 +1,54 @@
+{
+  "fov_key": "260825_p50_dna_4_6",
+  "stage": "spatial_subpixel",
+  "baseline_matrix": [
+    [
+      1.0002849102020264,
+      0.002093039220198989,
+      -20.30868148803711
+    ],
+    [
+      -0.0018671699799597263,
+      0.9998087286949158,
+      -19.744054794311523
+    ]
+  ],
+  "matrix": [
+    [
+      1.0001496076583862,
+      0.0015646028332412243,
+      -19.414579391479492
+    ],
+    [
+      -0.001952461781911552,
+      1.0003180503845215,
+      -20.7132511138916
+    ]
+  ],
+  "baseline_residual": {
+    "highpass_correlation": 0.5873029125147178,
+    "photometric_residual": 0.4126970874852822,
+    "phase_median_px": 0.7918701491472481,
+    "n_common_phase_tiles": 17,
+    "n_common_pixels": 58257
+  },
+  "refined_residual": {
+    "highpass_correlation": 0.6649065903712865,
+    "photometric_residual": 0.3350934096287135,
+    "phase_median_px": 0.7878563903071598,
+    "n_common_phase_tiles": 17,
+    "n_common_pixels": 58257
+  },
+  "refinement": {
+    "subpixel": {
+      "stage": "subpixel",
+      "accepted": true,
+      "n_features": 1218,
+      "n_tracks": 903,
+      "heldout_before_px": 0.4805183442531066,
+      "heldout_after_px": 0.23629989004878105,
+      "n_inliers": 550,
+      "reason": "improved"
+    }
+  }
+}

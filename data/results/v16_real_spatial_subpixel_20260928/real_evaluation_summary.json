@@ -1,0 +1,58 @@
+{
+  "pairs_attempted": 409,
+  "old_status_counts": {
+    "ok": 399,
+    "registration_qc_rejected": 10
+  },
+  "new_status_counts": {
+    "ok": 401,
+    "registration_qc_rejected": 8
+  },
+  "same_status_pairs": 407,
+  "old_only_accepted": [],
+  "new_only_accepted": [
+    {
+      "dataset": "260824_p50_SHC6OH",
+      "sample": 8,
+      "position": 4
+    },
+    {
+      "dataset": "260825_p50_dna",
+      "sample": 4,
+      "position": 5
+    }
+  ],
+  "residual_common_pairs": 399,
+  "photometric_residual_delta_old_to_new_final": {
+    "n": 399,
+    "lower": 255,
+    "higher": 76,
+    "unchanged": 68,
+    "median_delta": -0.013420232160573253,
+    "mean_delta": -0.059177870149500246
+  },
+  "phase_median_delta_old_to_new_final_px": {
+    "n": 399,
+    "lower": 191,
+    "higher": 140,
+    "unchanged": 68,
+    "median_delta": 0.0,
+    "mean_delta": -0.312147933088282
+  },
+  "photometric_residual_delta_old_to_new_coarse": {
+    "n": 399,
+    "lower": 177,
+    "higher": 78,
+    "unchanged": 144,
+    "median_delta": 0.0,
+    "mean_delta": -0.04607718666210216
+  },
+  "phase_median_delta_old_to_new_coarse_px": {
+    "n": 399,
+    "lower": 180,
+    "higher": 123,
+    "unchanged": 96,
+    "median_delta": 0.0,
+    "mean_delta": -0.30529078791976866
+  }
+}

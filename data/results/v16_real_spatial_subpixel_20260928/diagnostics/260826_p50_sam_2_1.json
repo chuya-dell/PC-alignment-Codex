@@ -1,0 +1,51 @@
+{
+  "fov_key": "260826_p50_sam_2_1",
+  "stage": "spatial_subpixel",
+  "baseline_matrix": [
+    [
+      1.0000338554382324,
+      -0.000321526633342728,
+      -6.786624908447266
+    ],
+    [
+      0.0010957992635667324,
+      1.0017638206481934,
+      -2.7717666625976562
+    ]
+  ],
+  "matrix": [
+    [
+      1.0000338554382324,
+      -0.000321526633342728,
+      -6.786624908447266
+    ],
+    [
+      0.0010957992635667324,
+      1.0017638206481934,
+      -2.7717666625976562
+    ]
+  ],
+  "baseline_residual": {
+    "highpass_correlation": 0.1782738906777282,
+    "photometric_residual": 0.8217261093222719,
+    "phase_median_px": 7.183477156390376,
+    "n_common_phase_tiles": 22,
+    "n_common_pixels": 58761
+  },
+  "refined_residual": {
+    "highpass_correlation": 0.1782738906777282,
+    "photometric_residual": 0.8217261093222719,
+    "phase_median_px": 7.183477156390376,
+    "n_common_phase_tiles": 22,
+    "n_common_pixels": 58761
+  },
+  "refinement": {
+    "subpixel": {
+      "stage": "subpixel",
+      "accepted": false,
+      "n_features": 1148,
+      "n_tracks": 274,
+      "reason": "insufficient_spatial_support"
+    }
+  }
+}
