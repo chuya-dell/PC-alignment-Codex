@@ -62,7 +62,7 @@ No metric from this function is used to accept a refinement.
 
 def main():
     p=argparse.ArgumentParser()
-    p.add_argument('--stage',choices=['baseline','subpixel','lattice','iterative'],required=True)
+    p.add_argument('--stage',choices=['baseline','subpixel','lattice','iterative','spatial_subpixel'],required=True)
     p.add_argument('--data-root',type=Path,required=True)
     p.add_argument('--output',type=Path,required=True)
     p.add_argument('--manifest',type=Path,default=ROOT/'data/results/v10_phase2_bright_band_mask_20260926/masked_50862c8/source_manifest_attached.csv')
@@ -85,6 +85,12 @@ def main():
     def register(pre,post,return_qc=False,**kwargs):
         if a.stage=='baseline':
             coarse=reg.register_image_pair_affine(pre,post);final,info=coarse,{}
+        elif a.stage=='spatial_subpixel':
+            # Re-estimate coarse registration through the v15 spatial-support path,
+            # then apply the same guarded subpixel stage used by the earlier cohort.
+            coarse=reg.register_image_pair_affine(pre,post)
+            from shared.v2_registration_precision.refinement import register_refined
+            final,info=register_refined(pre,post,stage='subpixel',initial=coarse)
         else:
             prior={'subpixel':'real_baseline','lattice':'real_cascade_subpixel',
                    'iterative':'real_cascade_lattice'}[a.stage]
