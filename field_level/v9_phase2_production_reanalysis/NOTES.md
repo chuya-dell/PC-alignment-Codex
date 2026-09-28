@@ -36,6 +36,28 @@ FOV単位exact Mann-Whitney集計）は、これまで位置合わせだけを�
 `AffineTransformQCError`が送出されたFOV/サンプル対は`registration_qc_rejected`として記録し、
 以降のBlank閾値・Mann-Whitney計算から除外する。
 
+### 2026-09-26: サンプリングへの明部帯マスク適用
+
+`register_image_pair_affine`の前処理と同じ`bright_band_mask`を前・後の生画像に適用する。
+前画像のFFT格子特徴量抽出は`sample_grid_features(..., invalid_mask=pre_invalid_mask)`へ渡し、
+後画像は前格子をアフィン変換した後、`sample_contrast(..., invalid_mask=post_invalid_mask)`へ渡す。
+いずれも3×3サンプリング領域がマスクと重なる格子点を無効にする。
+前後いずれかで無効となった点は下流の差分・Blank閾値・閾値超過率から除外する。
+FOVごとの出力には前・後画像のマスク画素数と画像に対する面積割合、前・後それぞれでマスクに重なる
+格子点数、前後の和集合で無効となった格子点数も記録する。位置合わせのQCで棄却された組にも画像マスク面積を記録し、
+格子特徴量を抽出しない棄却組の格子点数は空欄となる。
+
+小規模な模擬画像確認では、前画像の横帯と後画像の縦帯の両方で無効領域を作り、9格子点中4点だけが
+有効として残ることを確認した。これは呼び出しとマスク伝播の確認であり、科学的な性能評価ではない。
+409組の正式再解析は2026年9月26日に完了した。旧commit `08b3566`と修正版の両方で、入力は添付409組、
+同じ818枚のFドライブ画像を使用した。双方で399組が受理され、10組が登録品質判定で棄却された。
+結果・前後比較・マスク面積と点数は`data/results/v10_phase2_bright_band_mask_20260926/`に保存した。
+260825 DNAの両側exact p値は0.053030から0.128205となり、方向は引き続きBlank > Sample 1である。
+詳細は同フォルダの`PHASE2_BRIGHT_BAND_MASK_SAMPLING_FINAL_20260926.md`を参照。
+
+指定された個人Google Drive/Obsidian側の`06_解析`と旧警告ノートは、接続中のDriveでは閲覧できない。
+誤った同名フォルダへの保存を避けたため、Vaultへの新ノート作成と警告ノートへのリンク追記は未完了。
+
 ## 入力
 
 382組の対象ペア（pre/postパス、dataset/sample/position/concentration/is_blank）は、
