@@ -11,6 +11,20 @@ from datetime import datetime, timezone
 ROOT = Path(__file__).resolve().parents[2]
 CODE = Path(__file__).resolve().parent
 
+# 数値結果はライブラリの版で変わる(手順5の分散比が、opencv/numpy/scipy の版違いで 0.2108 と 0.2542 に分かれた)。
+# 検証した版以外では、黙って別の数字を出さずに止まる。意図して違う版で動かすときだけ V37_ALLOW_VERSION_MISMATCH=1 を設定する。
+VERIFIED_VERSIONS = {'numpy':'2.5.3','scipy':'1.18.1','pandas':'3.0.6','cv2':'5.0.0'}
+def check_environment():
+    import importlib
+    bad = []
+    for name, want in VERIFIED_VERSIONS.items():
+        have = importlib.import_module(name).__version__
+        if have != want: bad.append('%s %s (検証済み %s)' % (name, have, want))
+    if bad and os.environ.get('V37_ALLOW_VERSION_MISMATCH') != '1':
+        sys.exit('ライブラリの版が検証済みと違うため停止: ' + ', '.join(bad) + '\n固定版の環境は requirements.txt(受け渡しフォルダ)と setup_from_handoff.py で作る。')
+    if bad: print('警告: 版が違うまま実行: ' + ', '.join(bad), flush=True)
+check_environment()
+
 def child(parent, name):
     return {p.name:p for p in parent.iterdir()}[name]
 
