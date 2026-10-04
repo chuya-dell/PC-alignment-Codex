@@ -1,0 +1,12 @@
+処理,コード,関数,行番号,既定値,実際の値
+窓画素,field_level\v32_band_origin_round5\field_round5_methods.py,tracking,101,21・31、別計算後一致確認,21・31、別計算後一致確認
+特徴点,field_level\v32_band_origin_round5\field_round5_methods.py,tracking,101,最大2500、品質0.015、最小距離12、区画5,最大2500、品質0.015、最小距離12、区画5
+反復,field_level\v32_band_origin_round5\field_round5_methods.py,tracking,101,40回、収束精度0.0001、階層0,40回、収束精度0.0001、階層0
+追跡選別,field_level\v32_band_origin_round5\field_round5_methods.py,tracking,101,往復0.2以下、予測差2以下、窓差0.2以下、画像縁20,往復0.2以下、予測差2以下、窓差0.2以下、画像縁20
+支持条件,field_level\v32_band_origin_round5\field_round5_methods.py,tracking,101,100点以上、32区画以上、保留誤差改善、二群差0.2以下,100点以上、32区画以上、保留誤差改善、二群差0.2以下
+平滑化画素,field_level\v32_band_origin_round5\field_round5_methods.py,kernel_field,91,256、正規分布型の重み,256、正規分布型の重み
+前後像読込,field_level\v32_band_origin_round5\field_round5_methods.py,read_image,39,元ビット深度、2044×2048、単一成分,同じ
+主補間,field_level\v35_band_origin_round8\field_round8_experiment.py,prepare,40,4倍帯域制限フーリエ補間、反射32画素、正方形画素開口,同じ
+逆写像,field_level\v35_band_origin_round8\field_round8_experiment.py,inverse_points,34,6反復,同じ
+合成,field_level\v35_band_origin_round8\field_round8_experiment.py,generate,50,64行ずつ、一次標本化、逆写像残差0.0001以下、16ビット丸め,同じ
+格子識別,field_level\v35_band_origin_round8\field_round8_experiment.py,build_field,84,前像の高速フーリエ変換からピッチ7.286の格子、余白30、保存識別子照合、最大差0.000001以下,周8の格子生成最大差0、保存識別子・座標を使用

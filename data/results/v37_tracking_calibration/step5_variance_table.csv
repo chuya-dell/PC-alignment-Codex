@@ -1,0 +1,7 @@
+視野,日程,条件,定義,分散比,無調整分散再現,模擬外れ値割合,実測外れ値割合,元の分散表,元の外れ値表,元の表フォルダ
+260926_7_5,260926,主帰無,平均標準偏差,0.2541634368488795,0.2470650333155304,0.0046624393882879,0.050470906378217,signed_field_metrics.csv,outlier_field_metrics.csv,data\results\v35_band_origin_round8\resume_20261004_final
+260926_7_5,260926,主帰無,中央値絶対偏差,0.2541634368488795,0.2470650333155304,0.011026669153301,0.0794013427825438,signed_field_metrics.csv,outlier_field_metrics.csv,data\results\v35_band_origin_round8\resume_20261004_final
+260926_7_5,260926,N3二倍,平均標準偏差,0.5566388814091702,0.3977084422949137,0.0177872062663185,0.050470906378217,signed_field_metrics.csv,outlier_field_metrics.csv,data\results\v35_band_origin_round8\resume_20261004_final
+260926_7_5,260926,N3二倍,中央値絶対偏差,0.5566388814091702,0.3977084422949137,0.0334180343155538,0.0794013427825438,signed_field_metrics.csv,outlier_field_metrics.csv,data\results\v35_band_origin_round8\resume_20261004_final
+260926_7_5,260926,較正利得補正,平均標準偏差,0.25416343684887954,0.24706503331553042,0.004662439388287952,0.050470906378217086,今回の再実行,今回の再実行,data\results\v35_band_origin_round8\resume_20261004_final
+260926_7_5,260926,較正利得補正,中央値絶対偏差,0.25416343684887954,0.24706503331553042,0.011026669153301007,0.07940134278254382,今回の再実行,今回の再実行,data\results\v35_band_origin_round8\resume_20261004_final
