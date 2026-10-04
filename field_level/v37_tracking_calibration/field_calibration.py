@@ -35,7 +35,10 @@ def table(name, rows):
 
 def resolve(value):
     p=Path(value)
-    parts=p.relative_to(ROOT).parts
+    try:parts=p.relative_to(ROOT).parts
+    except ValueError:
+        # 保存記録の絶対パスが別PCのもの：リポジトリ名より後ろを現在のROOTに付け替える。
+        names=[n.lower() for n in p.parts];parts=p.parts[names.index('pc-alignment-codex')+1:]
     q=ROOT
     for name in parts:q=child(q,name)
     return q
