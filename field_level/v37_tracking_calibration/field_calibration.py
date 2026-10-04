@@ -34,11 +34,9 @@ def table(name, rows):
         w=csv.DictWriter(f,fieldnames=list(rows[0]));w.writeheader();w.writerows(rows)
 
 def resolve(value):
-    p=Path(value)
-    try:parts=p.relative_to(ROOT).parts
-    except ValueError:
-        # 保存記録の絶対パスが別PCのもの：リポジトリ名より後ろを現在のROOTに付け替える。
-        names=[n.lower() for n in p.parts];parts=p.parts[names.index('pc-alignment-codex')+1:]
+    # 保存記録の絶対パスは、書いたPCの区切り文字・場所のまま入っている。どのPC・OSでも、リポジトリ名より後ろを現在のROOTに付け替える。
+    names=[n for n in str(value).replace('\\','/').split('/') if n]
+    parts=names[[n.lower() for n in names].index('pc-alignment-codex')+1:]
     q=ROOT
     for name in parts:q=child(q,name)
     return q
