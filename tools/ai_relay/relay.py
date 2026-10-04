@@ -12,10 +12,15 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 LIMIT_RE = re.compile(r"usage limit|rate[_ ]limit|limit reached|hit your .*limit", re.I)
 RESET_RE = re.compile(r"(?:try again at|resets?(?: at)?)\s*(\d{1,2}:\d{2}\s*[AP]M)", re.I)
-OTHER = {"claude": "codex", "codex": "claude"}
+OTHER = {"claude": "codex", "codex": "claude", "gemini": "claude"}
+ORDER = ["claude", "codex", "gemini"]
 
 
-class Limited(Exception):
+class AgentError(RuntimeError):
+    """The agent could not answer (missing, crashed, limited); hand over to another."""
+
+
+class Limited(AgentError):
     def __init__(self, agent, reset):
         super().__init__(f"{agent} hit its usage limit (reset: {reset})")
         self.agent, self.reset = agent, reset
@@ -38,11 +43,11 @@ def check_limit(agent, text):
         raise Limited(agent, reset.strftime("%Y-%m-%d %H:%M") if reset else "unknown")
 
 
-def _run(cmd, prompt, agent):
+def _run(cmd, prompt):
     exe = shutil.which(cmd[0])
     if not exe:
-        raise RuntimeError(f"{cmd[0]} not found on PATH")
-    done = subprocess.run([exe] + cmd[1:], input=prompt, capture_output=True,
+        raise AgentError(f"{cmd[0]} not found on PATH")
+    done = subprocess.run([exe] + cmd[1:], input=prompt or "", capture_output=True,
                           text=True, encoding="utf-8", cwd=ROOT)
     return done.returncode, (done.stdout or "") + (done.stderr or ""), done.stdout or ""
 
@@ -52,42 +57,54 @@ def call_codex(prompt, write):
         out = Path(tmp) / "last.txt"
         sandbox = "workspace-write" if write else "read-only"
         code, both, _ = _run(["codex", "exec", "-C", str(ROOT), "-s", sandbox,
-                              "-o", str(out), "-"], prompt, "codex")
+                              "-o", str(out), "-"], prompt)
         answer = out.read_text(encoding="utf-8").strip() if out.exists() else ""
-        if not answer:
+        if code != 0 or not answer:
             check_limit("codex", both)
-            raise RuntimeError(f"codex failed (exit {code}): {both[-500:]}")
+            raise AgentError(f"codex failed (exit {code}): {both[-500:]}")
         return answer
 
 
 def call_claude(prompt, write):
     tools = "Read,Glob,Grep" + (",Edit,Write" if write else "")
     code, both, stdout = _run(["claude", "-p", "--permission-mode", "default",
-                               "--allowedTools", tools], prompt, "claude")
+                               "--allowedTools", tools], prompt)
     if code != 0 or not stdout.strip():
         check_limit("claude", both)
-        raise RuntimeError(f"claude failed (exit {code}): {both[-500:]}")
+        raise AgentError(f"claude failed (exit {code}): {both[-500:]}")
     if len(stdout) < 300:
         check_limit("claude", stdout)
     return stdout.strip()
 
 
-CALL = {"claude": call_claude, "codex": call_codex}
+def call_gemini(prompt, write):
+    if write:
+        raise AgentError("gemini (agy) is read-only here; --write is not supported")
+    code, both, stdout = _run(["agy", "-p", prompt], None)
+    if code != 0 or not stdout.strip():
+        check_limit("gemini", both)
+        raise AgentError(f"gemini failed (exit {code}): {both[-500:]}")
+    if len(stdout) < 300:
+        check_limit("gemini", stdout)
+    return stdout.strip()
+
+
+CALL = {"claude": call_claude, "codex": call_codex, "gemini": call_gemini}
 
 
 def ask(first, prompt, write, notes):
-    """Ask `first`; if it is limited, hand over to the other. Returns (agent, answer)."""
-    resets = []
-    for agent in (first, OTHER[first]):
+    """Ask `first`; if it is limited or fails, hand over to the next agent. Returns (agent, answer)."""
+    failed = []
+    for agent in dict.fromkeys([first, OTHER[first], *ORDER]):
         try:
             answer = CALL[agent](prompt, write)
-            if resets:
-                notes.append(f"{first} was limited ({resets[0]}); {agent} answered instead")
+            if failed:
+                notes.append(f"{', '.join(failed)} unavailable; {agent} answered instead")
             return agent, answer
-        except Limited as limited:
-            resets.append(limited.reset)
-            notes.append(str(limited))
-    raise SystemExit("both agents are limited: " + "; ".join(notes))
+        except AgentError as error:
+            failed.append(agent)
+            notes.append(str(error))
+    raise SystemExit("no agent could answer: " + "; ".join(notes))
 
 
 def log(board, title, body):
@@ -126,7 +143,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("mode", choices=["ask", "discuss"])
     parser.add_argument("prompt")
-    parser.add_argument("--first", choices=["claude", "codex"], default="codex")
+    parser.add_argument("--first", choices=ORDER, default="codex")
     parser.add_argument("--rounds", type=int, default=2)
     parser.add_argument("--write", action="store_true", help="allow file edits (default: read-only)")
     parser.add_argument("--board", type=Path,

@@ -31,9 +31,28 @@ class RelayTest(unittest.TestCase):
     def test_both_limited_stops(self):
         def limited(prompt, write):
             raise relay.Limited("x", "unknown")
-        with mock.patch.dict(relay.CALL, {"codex": limited, "claude": limited}):
+        with mock.patch.dict(relay.CALL, {"codex": limited, "claude": limited, "gemini": limited}):
             with self.assertRaises(SystemExit):
                 relay.ask("codex", "q", False, [])
+
+    def test_crash_falls_back_to_next_agent(self):
+        def broken(prompt, write):
+            raise relay.AgentError("codex not found on PATH")
+        with mock.patch.dict(relay.CALL, {"codex": broken, "claude": lambda p, w: "ok"}):
+            self.assertEqual(relay.ask("codex", "q", False, []), ("claude", "ok"))
+
+    def test_falls_through_to_gemini(self):
+        def limited(prompt, write):
+            raise relay.Limited("x", "unknown")
+        calls = {"codex": limited, "claude": limited, "gemini": lambda p, w: "g"}
+        with mock.patch.dict(relay.CALL, calls):
+            self.assertEqual(relay.ask("codex", "q", False, [])[0], "gemini")
+
+    def test_long_answer_mentioning_limit_is_kept(self):
+        done = mock.Mock(returncode=0, stdout="x" * 400 + " rate limit", stderr="")
+        with mock.patch("relay.shutil.which", return_value="claude"), \
+             mock.patch("relay.subprocess.run", return_value=done):
+            self.assertIn("rate limit", relay.call_claude("q", False))
 
 
 if __name__ == "__main__":
