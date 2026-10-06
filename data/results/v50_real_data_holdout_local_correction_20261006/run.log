@@ -1,0 +1,23 @@
+﻿20 fovs
+40 fovs
+60 fovs
+80 fovs
+100 fovs
+120 fovs
+140 fovs
+160 fovs
+180 fovs
+200 fovs
+220 fovs
+240 fovs
+260 fovs
+280 fovs
+300 fovs
+320 fovs
+340 fovs
+360 fovs
+380 fovs
+400 fovs
+          scheme  n_fovs  median_raw  median_const  median_local  median_perm  improved_vs_const  worsened_vs_const  unchanged_vs_const  perm_improved_vs_const  median_reduction_vs_const  median_reduction_vs_raw
+0  block_checker     401      0.6157        0.5288        0.4806       0.5332                211                162                  28                      99                     0.0035                   0.0090
+1       random20     401      0.5969        0.5470        0.4609       0.5453                277                 77                  47                      84                     0.0148                   0.0194
