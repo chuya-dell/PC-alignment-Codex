@@ -1,0 +1,9 @@
+{
+  "n_joined": 1944,
+  "max_abs_diff_B_vs_v49_standard": 9.71445146547012e-17,
+  "max_abs_diff_C_vs_v49_selected": 9.93129189996722e-17,
+  "used_superseded_dir": false,
+  "aggregated_files": [
+    "tables/per_fov_arms.csv (this run only)"
+  ]
+}
