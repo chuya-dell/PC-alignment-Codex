@@ -1,0 +1,7 @@
+check,expected_or_required,observed,status,consequence
+source_script,20260928_digital_judgment_current_alignment/scripts_and_config/field_run_digital_judgment.py,exists,pass,source located by directory enumeration
+standard_script_import,from statsmodels.stats.multitest import multipletests required because script calls multipletests,missing from original script,fail,original reaches NameError after calculation
+permitted_derived_import,statsmodels package importable in execution environment,Python 3.13 ModuleNotFoundError: No module named statsmodels,fail,import-only derived copy cannot start
+project_venv,.venv/Scripts/python.exe exists,not found,fail,documented project environment unavailable
+target_raw_roots,260825 260827 260828 DNA 260829 DNA roots on W drive,all four enumerated and found,pass,not the stopping condition
+comparison_execution,reproduced standard required before correction comparison,not reproduced,not_run,no correction or dummy analysis performed
