@@ -1,0 +1,19 @@
+﻿date,board,field,condition,qc_reasons
+260825,1,5,1e-09,Phase-2 affine transform rejected by QC: |dy_center|=1334.832px exceeds 125px; |rotation|=61.201deg exceeds 3d
+260825,2,1,1e-10,Phase-2 affine transform rejected by QC: non-positive determinant (-0.00407637); |dx_center|=882.065px exceeds
+260825,2,8,1e-10,Phase-2 affine transform rejected by QC: non-positive determinant (-0.0012908); |dx_center|=2003.107px exceeds
+260825,8,1,1e-12,Phase-2 affine transform rejected by QC: |rotation|=5.274deg exceeds 3deg; anisotropy=1.148320 exceeds 1.1
+260825,8,4,1e-12,Phase-2 affine transform rejected by QC: anisotropy=1.105288 exceeds 1.1
+260825,9,8,1e-13,"Phase-2 affine transform rejected by QC: |dx_center|=240.293px exceeds 125px; scale=0.894378 outside [0.93, 1."
+260922,8,3,0,Phase-2 affine transform rejected by QC: non-positive determinant (-0.0012747); |dx_center|=906.107px exceeds 
+260923,4,5,1e-12,Phase-2 affine transform rejected by QC: |dx_center|=264.880px exceeds 125px; |dy_center|=952.335px exceeds 12
+260926,02,3,mismatch,差分キャッシュなし（位置合わせまたは標本化の処理不成立。詳細理由を旧表から復元できず）
+260926,5,5,1e-13,"Phase-2 affine transform rejected by QC: |rotation|=105.058deg exceeds 3deg; scale=0.040763 outside [0.93, 1.0"
+260927,10,1,1e-15,Phase-2 affine transform rejected by QC: |dx_center|=537.382px exceeds 125px; |dy_center|=247.808px exceeds 12
+260927,10,2,1e-15,Phase-2 affine transform rejected by QC: |dy_center|=737.228px exceeds 125px; |rotation|=31.565deg exceeds 3de
+260927,10,3,1e-15,Phase-2 affine transform rejected by QC: |dx_center|=170.841px exceeds 125px; |rotation|=15.767deg exceeds 3de
+260927,10,4,1e-15,"Phase-2 affine transform rejected by QC: scale=0.038143 outside [0.93, 1.05]; anisotropy=680.410604 exceeds 1."
+260927,10,5,1e-15,Phase-2 affine transform rejected by QC: non-positive determinant (-0.000812918); |dx_center|=950.051px exceed
+260927,10,6,1e-15,Phase-2 affine transform rejected by QC: |dx_center|=882.499px exceeds 125px; |dy_center|=509.392px exceeds 12
+260927,10,7,1e-15,Phase-2 affine transform rejected by QC: |dx_center|=459.479px exceeds 125px; |dy_center|=901.023px exceeds 12
+260927,10,8,1e-15,Phase-2 affine transform rejected by QC: non-positive determinant (-0.317505); |dy_center|=5786.886px exceeds 

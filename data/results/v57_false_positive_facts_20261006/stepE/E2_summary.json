@@ -1,0 +1,8 @@
+{
+ "n_detected": 632,
+ "fields_with_a_scar_line_within_300px_of_edge": 630,
+ "share_fields": 0.9968354430379747,
+ "near_zone_pillars_share_edge_lt300_pooled": 0.9568600975367214,
+ "near_zone_share_edge_lt300_field_median": 1.0,
+ "fields_with_near_zone_ge_300_pillars_edge_ge_300": 157
+}

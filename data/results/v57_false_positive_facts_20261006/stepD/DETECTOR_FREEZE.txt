@@ -1,0 +1,3 @@
+frozen: 2026-10-06T22:09:13+09:00 (before any distance-based exceedance result was computed)
+ddb4e6f588f3957f2d2126dce00a1a3bc0d7f891485de78a6ec2aa9fb8ac4509 *field_level/v57_false_positive_facts/field_v57_detect_scars.py
+59ef8b5047b96b1b74b54def0f5381a10e6fdb18159305a84c0746acfd82b16f *data/results/v57_false_positive_facts_20261006/stepD/detection_results.csv

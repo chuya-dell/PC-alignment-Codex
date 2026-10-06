@@ -1,0 +1,40 @@
+{
+ "n_fields": 632,
+ "n_blank_main": 69,
+ "outlier_counts_mean_def": {
+  "0.01": 127,
+  "0.02": 51,
+  "0.03": 29,
+  "0.04": 18,
+  "0.05": 10
+ },
+ "outlier_counts_median_def": {
+  "0.01": 234,
+  "0.02": 151,
+  "0.03": 104,
+  "0.04": 76,
+  "0.05": 51
+ },
+ "eligible_fields": 205,
+ "exceed_u_fields": 46,
+ "exceed_u_share": 0.22439024390243903,
+ "exceed_u_by_group": {
+  "analyte": {
+   "sum": 26,
+   "size": 128
+  },
+  "blank": {
+   "sum": 20,
+   "size": 69
+  },
+  "other": {
+   "sum": 0,
+   "size": 8
+  }
+ },
+ "exceed_u_binom": 47,
+ "exceed_u_median_definition": 47,
+ "blank_rate_mean": 0.006093477207744115,
+ "blank_rate_max": 0.0367620490704586,
+ "note": "reference for round-3 before/after comparison; mean-based exceedance with the date blank threshold (v25 stored differences); no exclusions"
+}
