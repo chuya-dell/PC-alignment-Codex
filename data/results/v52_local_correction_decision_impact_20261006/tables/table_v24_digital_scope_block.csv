@@ -1,0 +1,6 @@
+item,v24_residual_vectors,standard_digital_judgment,consequence
+pillar_coordinates,independent-centre detector x_px/y_px,FFT lattice xy,coordinates are not a shared pillar identity
+pillar_identifier,none persisted,lattice_m/lattice_n,no approved join exists for held-out-only judgment
+field_scope,401 fields including SAM and DNA,DNA concentration-test dates,401 fields are not the same judgment population
+insertion_point,residual prediction field,postxy immediately before post sampling,full-field correction is technically possible
+
