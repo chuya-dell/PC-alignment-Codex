@@ -25,12 +25,18 @@ def evaluate(xy, r, test_mask, key, rng):
     out['raw'] = np.linalg.norm(r[te], axis=1)
     c = np.median(r[tr], axis=0)
     out['const'] = np.linalg.norm(r[te] - c, axis=1)
-    name, cv, fn = v49.choose_and_fit(xy[tr], r[tr], key)
+    # Inner-split keys must differ from the outer split key modulo 10 (the hash split is mod 10);
+    # the first version used a key difference of 400 (=0 mod 10) in random20, which made the inner
+    # validation set EMPTY and silently selected the first candidate (block_affine_2x2).
+    # outer key is 500+i (random20); here key=900+i -> use +3 / +5 offsets (difference 403 / 405).
+    name, cv, fn = v49.choose_and_fit(xy[tr], r[tr], key + 3)
+    assert np.isfinite(cv), 'inner validation empty or NaN'
     out['local'] = np.linalg.norm(r[te] - fn(xy[te]), axis=1)
     perm = rng.permutation(tr.sum())
-    name_p, _, fn_p = v49.choose_and_fit(xy[tr], r[tr][perm], key + 7)
+    name_p, cv_p, fn_p = v49.choose_and_fit(xy[tr], r[tr][perm], key + 5)
+    assert np.isfinite(cv_p), 'inner validation empty or NaN (perm)'
     out['perm'] = np.linalg.norm(r[te] - fn_p(xy[te]), axis=1)
-    return out, name
+    return out, name, float(cv)
 
 
 def main():
@@ -51,8 +57,8 @@ def main():
                 bx = np.clip((xy[:, 0] / 2048 * 6).astype(int), 0, 5); by = np.clip((xy[:, 1] / 2044 * 6).astype(int), 0, 5)
                 test = ((bx + by) % 5 == 0)  # ~20% of blocks, spatially separated
             if test.sum() < 15 or (~test).sum() < 40: continue
-            res, name = evaluate(xy, r, test, 900 + i, rng)
-            rows.append(dict(fov_key=fov, scheme=scheme, n_train=int((~test).sum()), n_test=int(test.sum()), selected=name,
+            res, name, cv = evaluate(xy, r, test, 900 + i, rng)
+            rows.append(dict(fov_key=fov, scheme=scheme, n_train=int((~test).sum()), n_test=int(test.sum()), selected=name, inner_cv_score_px=cv,
                              raw_median=float(np.median(res['raw'])), const_median=float(np.median(res['const'])),
                              local_median=float(np.median(res['local'])), perm_median=float(np.median(res['perm']))))
         if (i + 1) % 20 == 0: print(f'{i+1} fovs', flush=True)
