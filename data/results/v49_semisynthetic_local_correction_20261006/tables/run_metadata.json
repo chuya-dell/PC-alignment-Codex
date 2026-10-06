@@ -1,0 +1,8 @@
+{
+  "seed": 20261006,
+  "stage": "probe",
+  "n_baseline_cases": 452,
+  "n_probe_sources": 27,
+  "n_probe_conditions": 1998,
+  "tolerance_px": 0.002
+}

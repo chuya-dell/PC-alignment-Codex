@@ -1,0 +1,39 @@
+Traceback (most recent call last):
+  File "C:\Users\chuya\PC-alignment-localcorr\field_level\v49_semisynthetic_local_correction\field_run_semisynthetic_local_correction.py", line 182, in <module>
+    if __name__=='__main__': main()
+                             ~~~~^^
+  File "C:\Users\chuya\PC-alignment-localcorr\field_level\v49_semisynthetic_local_correction\field_run_semisynthetic_local_correction.py", line 180, in main
+    make_plots(rows,examples,a.output/'figures')
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\chuya\PC-alignment-localcorr\field_level\v49_semisynthetic_local_correction\field_run_semisynthetic_local_correction.py", line 134, in make_plots
+    plt.figure(figsize=(10,5));
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "C:\Users\chuya\AppData\Local\Programs\Python\Python313\Lib\site-packages\matplotlib\pyplot.py", line 1042, in figure
+    manager = new_figure_manager(
+        num, figsize=figsize, dpi=dpi,
+        facecolor=facecolor, edgecolor=edgecolor, frameon=frameon,
+        FigureClass=FigureClass, **kwargs)
+  File "C:\Users\chuya\AppData\Local\Programs\Python\Python313\Lib\site-packages\matplotlib\pyplot.py", line 552, in new_figure_manager
+    return _get_backend_mod().new_figure_manager(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "C:\Users\chuya\AppData\Local\Programs\Python\Python313\Lib\site-packages\matplotlib\backend_bases.py", line 3504, in new_figure_manager
+    return cls.new_figure_manager_given_figure(num, fig)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "C:\Users\chuya\AppData\Local\Programs\Python\Python313\Lib\site-packages\matplotlib\backend_bases.py", line 3509, in new_figure_manager_given_figure
+    return cls.FigureCanvas.new_manager(figure, num)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\chuya\AppData\Local\Programs\Python\Python313\Lib\site-packages\matplotlib\backend_bases.py", line 1785, in new_manager
+    return cls.manager_class.create_with_canvas(cls, figure, num)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "C:\Users\chuya\AppData\Local\Programs\Python\Python313\Lib\site-packages\matplotlib\backends\_backend_tk.py", line 535, in create_with_canvas
+    window = tk.Tk(className="matplotlib")
+  File "C:\Users\chuya\AppData\Local\Programs\Python\Python313\Lib\tkinter\__init__.py", line 2465, in __init__
+    self.tk = _tkinter.create(screenName, baseName, className, interactive, wantobjects, useTk, sync, use)
+              ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_tkinter.TclError: Can't find a usable init.tcl in the following directories: 
+    {C:\Users\chuya\AppData\Local\Programs\Python\Python313\tcl\tcl8.6}
+
+
+
+This probably means that Tcl wasn't installed properly.
+
