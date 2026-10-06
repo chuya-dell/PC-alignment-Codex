@@ -1,0 +1,7 @@
+reference,access_mode,contents_used_or_checked
+W: registration_residual_spatial_correlation_20260928 real_center_residual_vectors.csv.gz,read-only,401-field v24 residual vectors used for numerical diagnostics
+local v24 real_by_fov.csv,read-only,structured component and range-censor flags joined to the new field table
+original clone v41 source,read-only copied snapshot,checked for existing rather than newly detected marker coordinates
+original clone v45 source,read-only copied snapshot,checked for existing rather than newly detected marker coordinates
+lab note 261004 round-1 report,read-only,checked the seven-field geometry file reference and its stated limited scope
+lab note v40 stop report,read-only,confirmed missing all-field center coordinates and the prohibition on inference

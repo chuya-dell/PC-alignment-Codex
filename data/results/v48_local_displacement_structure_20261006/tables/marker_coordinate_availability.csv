@@ -1,0 +1,5 @@
+source,scope,coordinate_status,used_for_distance_analysis,reason
+v41_crossmark_region_resweep source snapshot,all accepted fields,not used,no,v41 code proposes a new image-based detector; this diagnostic did not run it and does not treat proposed detections as existing coordinates
+v45_crossmark_visibility_and_registration source snapshot,pre/post field images,not used,no,v45 code performs a new image-based line search; it was inspected only and was not run
+v28 round1_visually_confirmed_marker_geometry.csv referenced by lab note,7 visually checked fields,unavailable,no,the referenced file was not present in accessible locations; its report text is not substituted for coordinates
+v40 stopped report,all fields,unavailable,no,documents that all-field cross-scratch centers were unavailable; missing values are not imputed as zero
