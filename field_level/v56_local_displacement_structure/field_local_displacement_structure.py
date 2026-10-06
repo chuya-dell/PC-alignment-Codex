@@ -1,4 +1,4 @@
-"""v48: quantify the spatial structure in the existing v24 residual vectors.
+"""v56: quantify the spatial structure in the existing v24 residual vectors.
 
 This is a diagnostic-only consumer of v24 output.  It neither estimates a new
 registration transform nor changes any production default.

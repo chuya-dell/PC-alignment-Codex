@@ -1,6 +1,6 @@
 # 確認: 未確認
 
-# v48 局所的な位置ずれの空間構造（第1周、2026-10-06）
+# v56 局所的な位置ずれの空間構造（第1周、2026-10-06）
 
 ## 範囲
 
@@ -26,9 +26,13 @@ v24 の既存の独立中心残差ベクトルを再集計した診断である�
 
 v48を選択した。元クローンの `field_level` でv41–v47、Git tagでv40までを確認し、W: 結果フォルダとラボノートの版番号も確認して、v48が未使用の最小番号だった。W:由来v24ベクトルのSHA-256は `b2b554b5d055bffb7f7a88478210c32fecda725183b082d3751bec7fabf35f0c`。来歴は `data/raw/artifact_provenance_registry.csv` に `newness_status=unknown` の読取り専用入力として記録した。
 
-Git commit とタグ `v48_local_displacement_structure_20261006` は試行したが、worktree metadata が保護された元クローンの `.git` 配下にあり `index.lock` を作成できず、権限エラーで未実施である。push は試行していない。
+Git commit とタグ `v56_local_displacement_structure_20261006` は試行したが、worktree metadata が保護された元クローンの `.git` 配下にあり `index.lock` を作成できず、権限エラーで未実施である。push は試行していない。
 
 ## 次周に必要な追加情報
 
 1. 局所補正の候補を半合成で比較するための、真値変形場・独立検証分割・評価指標を事前固定すること。
 2. マーカー距離を調べるには、既存取得物に由来する視野ID、座標系、x/y、画像サイズ、取得方法、承認状態を含む中心または線分座標が必要。v28の実CSVを取得できた場合も、7視野に限った解析として扱うこと。
+
+
+## 版番号の付け替え
+当初 v48 として作成。リモートの別作業 v48(v48_phase2_production_speedup)と番号が衝突したため、v56 に付け替えた(data/results/VERSION_ALIAS_local_correction_20261006.md)。本文中に残る「v48」は、この版を指す。
