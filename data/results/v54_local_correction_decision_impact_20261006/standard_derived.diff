@@ -1,0 +1,27 @@
+--- W:\GoogleDrive\chuya2816\5.解析結果_chu\20260928_digital_judgment_current_alignment\scripts_and_config\field_run_digital_judgment.py
++++ C:\Users\chuya\PC-alignment-localcorr\field_level\v54_local_correction_decision_impact\field_standard_derived.py
+@@ -4,20 +4,21 @@
+ import numpy as np
+ import pandas as pd
+ from scipy.stats import mannwhitneyu, spearmanr, norm
++from statsmodels.stats.multitest import multipletests
+ import matplotlib
+ matplotlib.use('Agg')
+ import matplotlib.pyplot as plt
+ import cv2
+ 
+-ROOT=Path(r'C:\Users\labuser\Documents\Codex\2026-09-26\gikt\outputs\PC-alignment-Codex')
++ROOT=Path('C:\\Users\\chuya\\PC-alignment-localcorr')
+ sys.path.insert(0,str(ROOT))
+ from shared import registration as reg
+ from shared.lattice_indexing import lattice_from_fft, grid_coordinates
+ from shared.v2_registration_precision.refinement import register_refined
+ 
+-OUT=Path(r'W:\GoogleDrive\chuya2816\5.解析結果_chu\digital_judgment_current_alignment_20260928')
++OUT=Path('C:\\Users\\chuya\\PC-alignment-localcorr\\data\\results\\v54_local_correction_decision_impact_20261006\\standard')
+ RAW=Path(r'W:\GoogleDrive\chuya2816\5.生データD_chu')
+-REMOTE=Path(r'W:\GoogleDrive\fdtdremote\4.生データD_remo')
++REMOTE=Path('W:\\GoogleDrive\\chuya2816\\5.生データD_chu')
+ DATES={
+  '260825':('260825_p50_dna',{0:0,1:1e-9,2:1e-10,3:1e-11,4:1e-12,5:1e-13,6:1e-14,7:1e-15,8:1e-12,9:1e-13}),
+  '260827':('260827_pp50_dna',{1:'excluded',2:1e-10,3:'excluded',4:1e-12,5:1e-13,6:'excluded',7:1e-15,8:'blank_reference',9:'excluded',10:'excluded',11:0,12:1e-9}),

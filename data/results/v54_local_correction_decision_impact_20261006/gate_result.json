@@ -1,0 +1,39 @@
+{
+  "gate_passed": false,
+  "raw_pairs": 289,
+  "successful_fields": 283,
+  "summaries": [
+    {
+      "table": "fields",
+      "comparisons": 7641,
+      "matched": 7269,
+      "mismatched": 372
+    },
+    {
+      "table": "concentrations",
+      "comparisons": 1170,
+      "matched": 1068,
+      "mismatched": 102
+    },
+    {
+      "table": "spearman",
+      "comparisons": 72,
+      "matched": 28,
+      "mismatched": 44
+    },
+    {
+      "table": "thresholds",
+      "comparisons": 144,
+      "matched": 36,
+      "mismatched": 108
+    }
+  ],
+  "scope": [
+    "260825",
+    "260827",
+    "260828",
+    "260829"
+  ],
+  "holm_family_recomputed": 234,
+  "holm_family_accepted": 540
+}
