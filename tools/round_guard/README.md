@@ -1,0 +1,15 @@
+# round_guard
+
+周回の最後に `ラボノート/03_やること` と `ラボノート/02_進捗` が更新されたかを、Claude Code の Stop フックで確かめる。
+
+- `python round_guard.py start [--theme テーマ名]... [--record 周回記録のパス]`：周回の開始時に印（`~/.claude/round-guard/active-round.json`）を作る。起動器 `Invoke-ClaudeRound.ps1` は自動で `--record` つきで呼ぶ（テーマ名は手で渡す）
+- `python round_guard.py end`：周回の終わりに印を消す。印がなければ検査は何もしない
+- 検査：開始時刻より後に更新された 03・02 のファイルに、その周回の最終報告書のファイル名かテーマ名が入っていること。02 は、周回記録に「02_進捗は変更なし」があれば可
+- 5回止めても直らなければ、周回記録に「未更新のまま終了」と書いて通す。3行報告の(3)にも同じことを書く
+
+## Claude Code の設定を元に戻す手順
+Stop フックは `C:\Users\chuya\.claude\settings.json` の `hooks.Stop[0].hooks[0]`（`round_guard.py check`）として入っている。
+
+1. 設定ごと戻す：このフォルダの `claude_settings_before_round_guard_261008.json`（フック追加前の写し）を `C:\Users\chuya\.claude\settings.json` に上書きコピーする
+2. フックだけ外す：`settings.json` の `hooks.Stop[0].hooks` から `round_guard.py check` の1件を消す
+3. 一時的に止める：`python round_guard.py end` で印を消す（印がなければ検査は働かない）
