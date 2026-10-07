@@ -16,3 +16,18 @@ Stop フックは `C:\Users\chuya\.claude\settings.json` の `hooks.Stop[0].hook
 
 ## 起動器との連携（2026-10-08 確認済み）
 `Invoke-ClaudeRound.ps1` は、開始時に `start --record <記録パス> --theme <テーマ名>` を呼び、終了時（finally）に `end` を呼ぶ。テーマ名は `-Theme` で渡せる。省略時は、プロンプトの「引き継ぎを読んで：<テーマ>」から取る（取れなければ最終報告書名だけで内容を確かめる）。
+
+## 置き場所（実際に動いているもの）
+**実際に動いているのは `C:\Users\chuya\.claude\hooks\round_guard\` の写し**（`C:\Users\chuya\.claude\settings.json` のフックと、起動器 `Invoke-ClaudeRound.ps1` がここを指す）。このリポジトリの `tools/round_guard/` は、元のコードの保管場所（`main` が正）。作業コピーのブランチを切り替えても、動いている側は壊れない。
+
+**直したら写しも更新する。写しの更新手順:**
+1. このリポジトリで直して commit する（`main` に入れる）
+2. 写しを上書きする（作業コピーが別のブランチのときは、`git show main:tools/round_guard/round_guard.py` で取り出して置く）:
+   `Copy-Item C:\Users\chuya\PC-alignment-Codex\tools\round_guard\round_guard.py C:\Users\chuya\.claude\hooks\round_guard\ -Force`
+3. 写しを手で1回動かして、動くことを確かめる
+
+## 履歴
+- `v66_round_guard_20261008`：**止まらない版**（終了コード2で止める作りだったが、PowerShell 経由で終了コードが1になり、止めなかった）。使わない
+- `v67_round_guard_verified_20261008`：JSON（decision=block）で止める版。内容検査・通すときの記録つき
+- `v68_round_guard_launcher_verified_20261008`：起動器との連携（`-Theme`）を確認
+- `v69_hooks_copy_20261008`：`C:\Users\chuya\.claude\hooks\` に写しを置き、`main` に取り込んだ版

@@ -69,7 +69,7 @@ def main():
 
     date_str = datetime.now().strftime("%Y-%m-%d_%H%M")
     # Yoga 用：保存先は Google ドライブの同期フォルダ。無ければ何もせず正常に終わる（親フォルダは作らない）
-    output_dir = r"W:\GoogleDrive\chuya2816\AI会話ログ"
+    output_dir = os.environ.get("SAVE_SESSION_YOGA_DIR", r"W:\GoogleDrive\chuya2816\AI会話ログ")  # 環境変数は試験用
     if not os.path.isdir(os.path.dirname(output_dir)):
         sys.exit(0)
     os.makedirs(output_dir, exist_ok=True)
