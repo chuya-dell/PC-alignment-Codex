@@ -13,3 +13,6 @@ Stop フックは `C:\Users\chuya\.claude\settings.json` の `hooks.Stop[0].hook
 1. 設定ごと戻す：このフォルダの `claude_settings_before_round_guard_261008.json`（フック追加前の写し）を `C:\Users\chuya\.claude\settings.json` に上書きコピーする
 2. フックだけ外す：`settings.json` の `hooks.Stop[0].hooks` から `round_guard.py check` の1件を消す
 3. 一時的に止める：`python round_guard.py end` で印を消す（印がなければ検査は働かない）
+
+## 起動器との連携（2026-10-08 確認済み）
+`Invoke-ClaudeRound.ps1` は、開始時に `start --record <記録パス> --theme <テーマ名>` を呼び、終了時（finally）に `end` を呼ぶ。テーマ名は `-Theme` で渡せる。省略時は、プロンプトの「引き継ぎを読んで：<テーマ>」から取る（取れなければ最終報告書名だけで内容を確かめる）。
