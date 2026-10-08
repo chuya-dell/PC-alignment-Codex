@@ -16,10 +16,10 @@ import v75_run_pairs as RP
 import v74_scar_distance as E
 import v72_readout as R
 import field_control_common as M60
-OUT = ROOT / 'data/results/v77_signal_injection_P2'
+OUT = ROOT / ('data/results/v77_signal_injection_P3_high' if '--amps' in sys.argv else 'data/results/v77_signal_injection_P2')
 V70 = ROOT / 'data/results/v70_ledger_center_fit'; V72 = ROOT / 'data/results/v72_real_field_readout'
 W, H = 2048, 2044
-AMPS = [3, 5, 10]; DIRS = ['dim', 'bright']; ZONES = ['center', 'edge', 'scar_out']; PATS = ['isolated', 'cluster']
+AMPS = [int(x) for x in sys.argv[sys.argv.index('--amps') + 1].split(',')] if '--amps' in sys.argv else [3, 5, 10]; DIRS = ['dim', 'bright']; ZONES = ['center', 'edge', 'scar_out']; PATS = ['isolated', 'cluster']
 KS = [3, 4, 5, 6, 8]
 RDS = ['S0', 'S1', 'S2', 'S3', 'S4', 'S5', 'S3P', 'S4P', 'S5P']
 SIG = 1.3
