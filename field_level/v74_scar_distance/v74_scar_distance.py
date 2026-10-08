@@ -42,7 +42,7 @@ def bg_masked_contrast(im, mask):
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
     led = pd.read_csv(V70 / 'ledger.csv', dtype={'date': str, 'board': str}).set_index('fid')
-    th = pd.read_csv(V72 / 'thresholds.csv', dtype={'date': str}); th = th[th.thr == 'G'].set_index(['date', 'readout']).threshold
+    th = pd.read_csv(V72 / 'thresholds_v2.csv', dtype={'date': str}); th = th[th.thr == 'G'].set_index(['date', 'readout']).threshold
     rows = []
     for fid, r in led.iterrows():
         mask = R.load_mask(fid)

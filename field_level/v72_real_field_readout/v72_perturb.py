@@ -20,7 +20,7 @@ c0 = np.array([1024., 1022.]); corners = np.array([[0, 0], [2048, 0], [0, 2044],
 def main():
     led = pd.read_csv(V70 / 'ledger.csv', dtype={'date': str, 'board': str}).set_index('fid')
     sets = json.load(open(OUT / 'sets.json'))
-    th = pd.read_csv(OUT / 'thresholds.csv', dtype={'date': str}); th = th[(th.readout == 'S1') & (th.thr == 'G')].set_index('date').threshold
+    th = pd.read_csv(OUT / 'thresholds_v2.csv', dtype={'date': str}); th = th[(th.readout == 'S1') & (th.thr == 'G')].set_index('date').threshold
     rows = []
     for fid in sets['normal_blank20']:
         r = led.loc[fid]; z2 = np.load(V70 / 'fields2' / f'{fid}.npz'); z1 = np.load(V70 / 'fields' / f'{fid}.npz')
