@@ -8,7 +8,7 @@ import numpy as np, pandas as pd
 import v78_calibrate as K, field_control_common as M
 V70, V72, V78 = K.V70, K.V72, K.V78
 rng = np.random.default_rng(20261008)
-def ratio(xy, d, k=4, nsh=10):
+def ratio(xy, d, k=3, nsh=10):
     ok = np.isfinite(d); v = d[ok]; med = np.median(v); mad = 1.4826 * np.median(abs(v - med)); t = med + k * mad
     m = M.band_metrics(xy, d, t, False); pos = ok & (d > t); n = int(pos.sum())
     if n < 20: return np.nan, n, m['band_power']
