@@ -19,8 +19,8 @@ c0 = np.array([W / 2, H / 2])
 
 def analyse_pair(a, b, A_override=None, shift_hint=None):
     """a (pre), b (post): float32 raw images.  Returns dict.  A_override: use this 2x3 matrix instead of the standard estimate."""
-    std = L.standard_run(a, b)
-    A = std['matrix'] if A_override is None else A_override
+    std = L.standard_run(a, b, matrix=A_override)
+    A = std['matrix']
     ca_ = C.centers_smooth(a); cb_ = C.centers_smooth(b)
     Bpre = ca_['model'][1:].T; Bpost = cb_['model'][1:].T
     U = np.rint(np.linalg.inv(Bpost) @ A[:, :2] @ Bpre).astype(int)
@@ -58,9 +58,37 @@ def analyse_pair(a, b, A_override=None, shift_hint=None):
     bcA = post_d['ctr'][jA]
     out['S3A'] = R.rnd(boxa, ac) - R.rnd(boxb, bcA); out['S4A'] = R.bil(boxa, ac) - R.bil(boxb, bcA)
     for k in ('S3A', 'S4A'): out[k][~okA] = np.nan
+    # P readouts: pre-centre based; post at L-mapped + local offset (validity from the PRE image only)
+    okP = (~Sp) & ovL & (dL < 2.0)
+    posP = local_offset_positions(ca_['ctr'], expL, post_d['ctr'][jL], okL)
+    out['okP'] = okP; out['posP'] = posP
+    out['S3P'] = R.rnd(boxa, ac) - R.rnd(boxb, posP); out['S4P'] = R.bil(boxa, ac) - R.bil(boxb, posP); out['S5P'] = R.aper(pa, ac) - R.aper(pb, posP)
+    for k in ('S3P', 'S4P', 'S5P'): out[k][~okP] = np.nan
     # second-order information for local thresholds / maps
     out['pre_dict'] = pre_d
     return out
+
+
+def local_offset_positions(ctr_pre_nodes, expL, post_ctr_matched, ok, block=64):
+    """Post reading positions: L-mapped pre centre + smooth local offset (block median of fitted-post minus mapped-pre over trusted nodes).
+    No per-pillar post fit is used, so a pillar whose own brightness changed is still read at its physical position."""
+    off = post_ctr_matched - expL
+    gx = np.clip((expL[:, 0] // block).astype(int), 0, W // block - 1); gy = np.clip((expL[:, 1] // block).astype(int), 0, H // block - 1)
+    ny, nx = H // block + 1, W // block
+    cell = gy * nx + gx
+    medx = np.full(ny * nx, np.nan); medy = np.full(ny * nx, np.nan)
+    sel = ok & (np.linalg.norm(off, axis=1) < 3.0)
+    order = np.argsort(cell[sel]); cs = cell[sel][order]; ox = off[sel, 0][order]; oy = off[sel, 1][order]
+    b = np.flatnonzero(np.diff(cs)) + 1
+    for c_, sx, sy in zip(np.split(cs, b), np.split(ox, b), np.split(oy, b)):
+        if len(sx) >= 20: medx[c_[0]] = np.median(sx); medy[c_[0]] = np.median(sy)
+    from scipy import ndimage
+    gm = (np.nanmedian(medx), np.nanmedian(medy))
+    mx = np.where(np.isfinite(medx), medx, gm[0]).reshape(ny, nx); my = np.where(np.isfinite(medy), medy, gm[1]).reshape(ny, nx)
+    mx = ndimage.median_filter(mx, size=3, mode='nearest'); my = ndimage.median_filter(my, size=3, mode='nearest')
+    px = expL[:, 0] / block - .5; py = expL[:, 1] / block - .5
+    ox_ = ndimage.map_coordinates(mx, [py, px], order=1, mode='nearest'); oy_ = ndimage.map_coordinates(my, [py, px], order=1, mode='nearest')
+    return expL + np.column_stack([ox_, oy_])
 
 
 READS_STD = ['S0', 'S1', 'S2']

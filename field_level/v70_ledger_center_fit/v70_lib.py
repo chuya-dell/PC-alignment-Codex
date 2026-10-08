@@ -178,10 +178,14 @@ def match_pre_post(cf_pre, cf_post, matrix):
     return j, d, exp
 
 
-def standard_run(pre, post):
-    """Current standard re-run from raw images (named current_standard_v70)."""
-    coarse, qc = reg.register_image_pair_affine(pre, post, mask_stains=False, return_qc=True)
-    matrix, ref = register_refined(pre, post, stage='subpixel', initial=coarse, mask_stains=False)
+def standard_run(pre, post, matrix=None):
+    """Current standard re-run from raw images (named current_standard_v70).  matrix: optional fixed 2x3 transform that bypasses the
+    registration (used for pairs without stage motion, e.g. the focus series, where the QC rejects the estimate)."""
+    if matrix is None:
+        coarse, qc = reg.register_image_pair_affine(pre, post, mask_stains=False, return_qc=True)
+        matrix, ref = register_refined(pre, post, stage='subpixel', initial=coarse, mask_stains=False)
+    else:
+        matrix = np.asarray(matrix, float); qc = {}; ref = {}
     lattice = lattice_from_fft(pre, PITCH)
     ids, xy = grid_coordinates(lattice, pre.shape[1], pre.shape[0], margin=30)
     postxy = xy @ matrix[:, :2].T + matrix[:, 2]
