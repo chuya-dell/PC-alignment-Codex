@@ -92,8 +92,14 @@ def upsample4(img):
 
 
 def integrate4(fine):
-    h, w = fine.shape[0] // 4, fine.shape[1] // 4
-    return fine.reshape(h, 4, w, 4).mean(axis=(1, 3))
+    """Area-integrate the 4x fine grid back to original pixels, centred on the pixel: pixel n covers positions n-0.5..n+0.5 = fine indices 4n-2..4n+2
+    (end samples at half weight).  Earlier versions used fine indices 4n..4n+3 (a constant -0.375 px offset; found by the Codex audit) and then 4n-2..4n+1
+    (+0.125 px); this symmetric version has zero offset."""
+    wts = {-2: .5, -1: 1., 0: 1., 1: 1., 2: .5}
+    t = sum(wk * np.roll(fine, -k, axis=0) for k, wk in wts.items()) / 4.0
+    t = t[::4, :]
+    t = sum(wk * np.roll(t, -k, axis=1) for k, wk in wts.items()) / 4.0
+    return t[:, ::4]
 
 
 def synth_shift(fine, dx, dy):

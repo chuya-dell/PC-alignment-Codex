@@ -34,7 +34,8 @@ def one(rec):
         ov = (expL[:, 0] >= 8) & (expL[:, 0] < W - 8) & (expL[:, 1] >= 8) & (expL[:, 1] < H - 8)
         okL = (~Sp) & (~So[jL]) & z2['consL'] & ov
         okP = (~Sp) & ov & z2['consL']
-        posP = P.local_offset_positions(pre_d['ctr'], expL, post_d['ctr'][jL], okL)
+        expC = pre_d['ctr'] @ Llin.T + tL
+        posP = P.local_offset_positions(expC, post_d['ctr'][jL], okL)
         ac = pre_d['ctr']
         S3P = R.rnd(boxa, ac) - R.rnd(boxb, posP); S5P = R.aper(pa, ac) - R.aper(pb, posP)
         S3P[~okP] = np.nan; S5P[~okP] = np.nan
