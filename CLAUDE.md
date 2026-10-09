@@ -21,6 +21,8 @@
 
 Codex の呼び方:必ず `-p <light|main|deep|verify>` を付け、標準入力を閉じる(`< /dev/null`)。閉じないと `codex exec` が入力待ちで止まり続ける(2026-10-09 に実測)。プロファイルは `~/.codex/<名前>.config.toml` で、`~/.codex/config.toml` の既定は main と同じ。
 
+サブエージェントの呼び方:research-lead と recorder を呼び出す際は、`model` 引数を指定せず、各サブエージェントの定義ファイル(`.claude/agents/*.md`)に記載された `model:` を適用する(指定すると、ファイルの `model:` より優先されて別のモデルで動く)。
+
 ### 規則
 1. 作業の種類で、最初のモデルを決める(上の表)。迷う作業は main(Codex)/ Sonnet(Claude Code)から始める。
 2. 失敗したら、自動で1段だけ上げてよい(light → main → deep、Haiku → Sonnet)。同じ段で2回失敗したら上げる。「失敗」は、検収で不合格、またはエラー終了。deep と Sonnet より上へは、規則3.の範囲でだけ上げる。
