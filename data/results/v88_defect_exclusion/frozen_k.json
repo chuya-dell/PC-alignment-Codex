@@ -1,0 +1,86 @@
+{
+  "evaluation": "事後の再評価（独立な検証ではない）",
+  "radius": 20,
+  "calibration": [
+    {
+      "evaluation": "事後の再評価（独立な検証ではない）",
+      "radius": 0,
+      "side": "negative",
+      "k": 11.5,
+      "reached": true,
+      "n_fields": 69,
+      "p95_fp91k": 1.92742123484602,
+      "p95_count": 1.5999999999999943,
+      "mean_count": 0.2318840579710145,
+      "max_count": 3,
+      "max_lost_fraction": 0.0
+    },
+    {
+      "evaluation": "事後の再評価（独立な検証ではない）",
+      "radius": 0,
+      "side": "positive",
+      "k": 10.5,
+      "reached": true,
+      "n_fields": 69,
+      "p95_fp91k": 1.9999044545864137,
+      "p95_count": 1.5999999999999943,
+      "mean_count": 0.36231884057971014,
+      "max_count": 9,
+      "max_lost_fraction": 0.0
+    },
+    {
+      "evaluation": "事後の再評価（独立な検証ではない）",
+      "radius": 0,
+      "side": "two_sided",
+      "k": 13.0,
+      "reached": true,
+      "n_fields": 69,
+      "p95_fp91k": 1.92742123484602,
+      "p95_count": 1.5999999999999943,
+      "mean_count": 0.21739130434782608,
+      "max_count": 2,
+      "max_lost_fraction": 0.0
+    },
+    {
+      "evaluation": "事後の再評価（独立な検証ではない）",
+      "radius": 20,
+      "side": "negative",
+      "k": 9.5,
+      "reached": true,
+      "n_fields": 69,
+      "p95_fp91k": 1.384590243059252,
+      "p95_count": 1.0,
+      "mean_count": 0.17391304347826086,
+      "max_count": 4,
+      "max_lost_fraction": 0.006718303212015164
+    },
+    {
+      "evaluation": "事後の再評価（独立な検証ではない）",
+      "radius": 20,
+      "side": "positive",
+      "k": 9.0,
+      "reached": true,
+      "n_fields": 69,
+      "p95_fp91k": 1.3320362526819554,
+      "p95_count": 1.0,
+      "mean_count": 0.2318840579710145,
+      "max_count": 10,
+      "max_lost_fraction": 0.006718303212015164
+    },
+    {
+      "evaluation": "事後の再評価（独立な検証ではない）",
+      "radius": 20,
+      "side": "two_sided",
+      "k": 10.0,
+      "reached": true,
+      "n_fields": 69,
+      "p95_fp91k": 1.9374003220769758,
+      "p95_count": 1.5999999999999943,
+      "mean_count": 0.2608695652173913,
+      "max_count": 9,
+      "max_lost_fraction": 0.006718303212015164
+    }
+  ],
+  "positive": "後ろ像の減光",
+  "negative": "後ろ像の増光"
+}
