@@ -1,0 +1,28 @@
+{
+  "evaluation": "事後の再評価（独立な検証ではない）",
+  "preregistration": "v3",
+  "nonblank_fields": 547,
+  "blank_fields": 69,
+  "null_iterations": 1000,
+  "E5_repetitions": 200,
+  "split_repetitions": 200,
+  "seed": 26101090,
+  "prohibited_arrays_opened": 0,
+  "array_reads": 1848,
+  "v88_E1_exact_count_match": true,
+  "input_integrity": true,
+  "first_day_excluded": [
+    "E4",
+    "E4u",
+    "E7"
+  ],
+  "unavailable_E5": [
+    {
+      "date": "260827",
+      "n": 48,
+      "available": 47
+    }
+  ],
+  "minimum_reference_n": null,
+  "elapsed_seconds": 1494.9108895999962
+}

@@ -1,0 +1,27 @@
+{
+  "n_fields": 547,
+  "n_centers": 13,
+  "n_phases": 2,
+  "local_rows": 14222,
+  "n_control_circles": 307864,
+  "all_controls_exact_count": true,
+  "no_matched_controls": 0,
+  "single_matched_control": 0,
+  "n_array_reads": 1094,
+  "prohibited_arrays_opened": 0,
+  "v89_missing_count_matches": true,
+  "input_integrity": true,
+  "seed": 26101091,
+  "bootstrap_repetitions": 2000,
+  "development_date_counts": {
+    "260825": 66,
+    "260827": 47,
+    "260828": 67,
+    "260829": 64,
+    "260922": 54,
+    "260923": 71,
+    "260924": 64,
+    "260926": 62,
+    "260927": 52
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "start": "2026-10-10T09:11:44.456436+00:00",
+  "seed": 26101090,
+  "task": "v90_only",
+  "inputs": {
+    "W:\\GoogleDrive\\chuya2816\\Obsidian Vault\\_依頼記録\\偽陽性ゼロ化_C1D\\261010_日付別欠陥表(iv)_設計と合否基準_事前登録.md": "512e2e03c76a4ecf4eab061b7d6e1bc29d6fe336b54b54aac56d1905b7435e4c",
+    "C:\\Users\\chuya\\PC-alignment-Codex\\data\\raw\\v88_camera_defects_unapproved.csv": "222330ecb2914037340b908e0b2ee6f088350d9782fc14b1e73cf5c426023001",
+    "C:\\Users\\chuya\\PC-alignment-Codex\\field_level\\v88_defect_exclusion\\field_stage1.py": "30b2602e1ee73196c3b4cd471809cc2f343e9ad094066e4b913f10458ef587ef",
+    "C:\\Users\\chuya\\PC-alignment-Codex\\field_level\\v89_defect_cause\\field_cause.py": "8ebb9bbce89b6a7ff1170e1e6ac0ec5848a2ad1b8694d63495864d0c1113c579",
+    "C:\\Users\\chuya\\PC-alignment-fp\\data\\results\\v85_abnormal_pillars\\E4_counts_all632.csv": "d1541febf751f62a8e4563fd101dc7b50cf1d435a25c766f37466fb56e14e8b5",
+    "C:\\Users\\chuya\\PC-alignment-Codex\\data\\results\\v88_defect_exclusion\\blank_counts_by_k.csv": "730011d7bd92f191ca5b37071bb805626903836541908a3e7ae66fb593f70eee"
+  }
+}
