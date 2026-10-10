@@ -1,0 +1,13 @@
+{
+  "field_rows": 7111,
+  "unique_fields": 547,
+  "date_center_rows": 117,
+  "boundary_rows": 104,
+  "array_reads": 1094,
+  "prohibited_identifiers_or_arrays_opened": 0,
+  "field_to_date_and_boundary_totals_match": true,
+  "confidence_intervals_contain_rates": true,
+  "original_reproducibility_matches": true,
+  "input_hashes_unchanged": true,
+  "exact_fisher_validation_cases": 345
+}

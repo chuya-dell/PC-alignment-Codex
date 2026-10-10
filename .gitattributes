@@ -17,3 +17,23 @@ data/results/v88_defect_exclusion/radius_sensitivity.csv -text
 data/results/v88_defect_exclusion/array_read_audit.csv -text
 data/results/v88_defect_exclusion/blank_counts_by_k.csv -text
 data/results/v88_defect_exclusion/array_provenance.csv -text
+
+# v89 の記録: 記録した SHA-256 と一致させるため、改行の自動変換を行わない
+data/results/v89_defect_cause/array_read_audit.csv -text
+data/results/v89_defect_cause/board_pos_within_date.csv -text
+data/results/v89_defect_cause/boundary_scan.csv -text
+data/results/v89_defect_cause/claude_review_and_corrections.md -text
+data/results/v89_defect_cause/codex_request.md -text
+data/results/v89_defect_cause/control_check.csv -text
+data/results/v89_defect_cause/date_center_table.csv -text
+data/results/v89_defect_cause/field_table.csv -text
+data/results/v89_defect_cause/input_integrity.csv -text
+data/results/v89_defect_cause/NOTES.md -text
+data/results/v89_defect_cause/preregistration_v1_v2.md -text
+data/results/v89_defect_cause/report.md -text
+data/results/v89_defect_cause/sensitivity.csv -text
+data/results/v89_defect_cause/unadopted_clusters.csv -text
+data/results/v89_defect_cause/v89_manifest.csv -text
+data/results/v89_defect_cause/verification.json -text
+data/results/v89_defect_cause/z5p_by_date.csv -text
+field_level/v89_defect_cause/field_cause.py -text
