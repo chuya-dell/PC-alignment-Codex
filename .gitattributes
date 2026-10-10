@@ -1,2 +1,19 @@
 # C1+D の欠陥表は、記録した SHA-256 と一致させるため、Git による改行コードの自動変換を行わない(元のバイト列を保持)。
 data/raw/v88_camera_defects_unapproved.csv -text
+# C1+D の記録表: 記録した SHA-256 と一致させるため、Git による改行コードの自動変換を行わない(元のバイト列を保持)。
+field_level/v88_defect_exclusion/NOTES.md -text
+data/results/v88_defect_exclusion/NOTES_before_hash_append.md -text
+data/results/v88_defect_exclusion/frozen_k.json -text
+data/results/v88_defect_exclusion/centers_full.csv -text
+data/results/v88_defect_exclusion/centers_early.csv -text
+data/results/v88_defect_exclusion/centers_late.csv -text
+data/results/v88_defect_exclusion/center_reproducibility.csv -text
+data/results/v88_defect_exclusion/date_split.csv -text
+data/results/v88_defect_exclusion/input_boundary.csv -text
+data/results/v88_defect_exclusion/stage1_summary.json -text
+data/results/v88_defect_exclusion/verification.json -text
+data/results/v88_defect_exclusion/calibration_k.csv -text
+data/results/v88_defect_exclusion/radius_sensitivity.csv -text
+data/results/v88_defect_exclusion/array_read_audit.csv -text
+data/results/v88_defect_exclusion/blank_counts_by_k.csv -text
+data/results/v88_defect_exclusion/array_provenance.csv -text

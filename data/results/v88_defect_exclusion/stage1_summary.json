@@ -1,0 +1,30 @@
+{
+  "evaluation": "事後の再評価（独立な検証ではない）",
+  "split_dates": {
+    "early": [
+      "260825",
+      "260827",
+      "260828",
+      "260829",
+      "260922"
+    ],
+    "late": [
+      "260923",
+      "260924",
+      "260926",
+      "260927"
+    ]
+  },
+  "nonblank_fields": 547,
+  "blank_fields": 69,
+  "reconstructed_centers": {
+    "early": 10,
+    "late": 12
+  },
+  "full_centers": 13,
+  "full_max_distance": 2.278173318171838e-13,
+  "reproduced_both": 9,
+  "reproducibility_pass": false,
+  "radius_failures": [],
+  "prohibited_arrays_opened": 0
+}

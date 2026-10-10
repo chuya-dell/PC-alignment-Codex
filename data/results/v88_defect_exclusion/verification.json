@@ -1,0 +1,13 @@
+{
+  "evaluation": "事後の再評価（独立な検証ではない）",
+  "baseline_compared_rows": 1725,
+  "baseline_max_difference": 0.0,
+  "count_rows": 31050,
+  "array_reads": 1301,
+  "calibrations_checked": 18,
+  "prohibited_array_reads": 0,
+  "python": "3.13.7",
+  "numpy": "2.3.3",
+  "pandas": "3.0.5",
+  "scipy": "1.16.2"
+}
