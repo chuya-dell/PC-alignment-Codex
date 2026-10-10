@@ -1,0 +1,2 @@
+# C1+D の欠陥表は、記録した SHA-256 と一致させるため、Git による改行コードの自動変換を行わない(元のバイト列を保持)。
+data/raw/v88_camera_defects_unapproved.csv -text
